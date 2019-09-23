@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.bkcc.logans.mapper.FieldEnumMapper">
+
+    <insert id="insertFieldEnum" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO logans_field2_enum
+            (task_id, file_id, enum_value, allow_regex)
+        VALUES
+            (#{taskId}, #{fileId}, #{enumValue}, #{allowRegex})
+    </insert>
+    
+    <delete id="deleteFieldEnumById">
+        DELETE FROM logans_field2_enum 
+        WHERE id = #{id}
+    </delete>
+    
+    <update id="updateFieldEnumById">
+        UPDATE logans_field2_enum 
+        SET id = #{id}
+            <if test="taskId != null"> 
+                , task_id = #{taskId}
+            </if>
+            <if test="fileId != null"> 
+                , file_id = #{fileId}
+            </if>
+            <if test="enumValue != null and enumValue != ''"> 
+                , enum_value = #{enumValue}
+            </if>
+            <if test="allowRegex != null and allowRegex != ''"> 
+                , allow_regex = #{allowRegex}
+            </if>
+        WHERE id = #{id}
+    </update>
+            
+    <select id="selectFieldEnumById" resultType="com.bkcc.logans.entity.FieldEnumEntity">
+        SELECT id, task_id taskId, file_id fileId, enum_value enumValue, allow_regex allowRegex
+        FROM logans_field2_enum
+        WHERE id = #{id}
+    </select>
+    
+    <select id="selectFieldEnumList" resultType="com.bkcc.logans.entity.FieldEnumEntity">
+        SELECT id, task_id taskId, file_id fileId, enum_value enumValue, allow_regex allowRegex
+        FROM logans_field2_enum  
+        WHERE 1 = 1 
+            <if test="taskId != null"> 
+                AND task_id = #{taskId}
+            </if>
+            <if test="fileId != null"> 
+                AND file_id = #{fileId}
+            </if>
+            <if test="enumValue != null and enumValue != ''"> 
+                AND enum_value LIKE CONCAT('%', #{enumValue}, '%')
+            </if>
+            <if test="allowRegex != null and allowRegex != ''"> 
+                AND allow_regex LIKE CONCAT('%', #{allowRegex}, '%')
+            </if>
+        ORDER BY id DESC
+    </select>
+    
+</mapper>

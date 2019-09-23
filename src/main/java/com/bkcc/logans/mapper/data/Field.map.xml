@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.bkcc.logans.mapper.FieldMapper">
+
+    <insert id="insertField" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO logans_field
+            (task_id, file_key, file_remark)
+        VALUES
+            (#{taskId}, #{fileKey}, #{fileRemark})
+    </insert>
+    
+    <delete id="deleteFieldById">
+        DELETE FROM logans_field 
+        WHERE id = #{id}
+    </delete>
+    
+    <update id="updateFieldById">
+        UPDATE logans_field 
+        SET id = #{id}
+            <if test="taskId != null"> 
+                , task_id = #{taskId}
+            </if>
+            <if test="fileKey != null and fileKey != ''"> 
+                , file_key = #{fileKey}
+            </if>
+            <if test="fileRemark != null and fileRemark != ''"> 
+                , file_remark = #{fileRemark}
+            </if>
+        WHERE id = #{id}
+    </update>
+            
+    <select id="selectFieldById" resultType="com.bkcc.logans.entity.FieldEntity">
+        SELECT id, task_id taskId, file_key fileKey, file_remark fileRemark
+        FROM logans_field
+        WHERE id = #{id}
+    </select>
+    
+    <select id="selectFieldList" resultType="com.bkcc.logans.entity.FieldEntity">
+        SELECT id, task_id taskId, file_key fileKey, file_remark fileRemark
+        FROM logans_field  
+        WHERE 1 = 1 
+            <if test="taskId != null"> 
+                AND task_id = #{taskId}
+            </if>
+            <if test="fileKey != null and fileKey != ''"> 
+                AND file_key LIKE CONCAT('%', #{fileKey}, '%')
+            </if>
+            <if test="fileRemark != null and fileRemark != ''"> 
+                AND file_remark LIKE CONCAT('%', #{fileRemark}, '%')
+            </if>
+        ORDER BY id DESC
+    </select>
+    
+</mapper>

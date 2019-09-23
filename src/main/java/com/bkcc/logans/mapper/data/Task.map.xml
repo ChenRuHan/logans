@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.bkcc.logans.mapper.TaskMapper">
+
+    <insert id="insertTask" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO logans_task
+            (task_name, module_name, req_method, req_uri, ans_type, ans_rate_type, out_queue)
+        VALUES
+            (#{taskName}, #{moduleName}, #{reqMethod}, #{reqUri}, #{ansType}, #{ansRateType}, #{outQueue})
+    </insert>
+    
+    <delete id="deleteTaskById">
+        DELETE FROM logans_task 
+        WHERE id = #{id}
+    </delete>
+    
+    <update id="updateTaskById">
+        UPDATE logans_task 
+        SET id = #{id}
+            <if test="taskName != null and taskName != ''"> 
+                , task_name = #{taskName}
+            </if>
+            <if test="moduleName != null and moduleName != ''"> 
+                , module_name = #{moduleName}
+            </if>
+            <if test="reqMethod != null and reqMethod != ''"> 
+                , req_method = #{reqMethod}
+            </if>
+            <if test="reqUri != null and reqUri != ''"> 
+                , req_uri = #{reqUri}
+            </if>
+            <if test="ansType != null"> 
+                , ans_type = #{ansType}
+            </if>
+            <if test="ansRateType != null"> 
+                , ans_rate_type = #{ansRateType}
+            </if>
+            <if test="outQueue != null and outQueue != ''"> 
+                , out_queue = #{outQueue}
+            </if>
+        WHERE id = #{id}
+    </update>
+            
+    <select id="selectTaskById" resultType="com.bkcc.logans.entity.TaskEntity">
+        SELECT id, task_name taskName, module_name moduleName, req_method reqMethod, req_uri reqUri, ans_type ansType, ans_rate_type ansRateType, out_queue outQueue
+        FROM logans_task
+        WHERE id = #{id}
+    </select>
+    
+    <select id="selectTaskList" resultType="com.bkcc.logans.entity.TaskEntity">
+        SELECT id, task_name taskName, module_name moduleName, req_method reqMethod, req_uri reqUri, ans_type ansType, ans_rate_type ansRateType, out_queue outQueue
+        FROM logans_task  
+        WHERE 1 = 1 
+            <if test="taskName != null and taskName != ''"> 
+                AND task_name LIKE CONCAT('%', #{taskName}, '%')
+            </if>
+            <if test="moduleName != null and moduleName != ''"> 
+                AND module_name LIKE CONCAT('%', #{moduleName}, '%')
+            </if>
+            <if test="reqMethod != null and reqMethod != ''"> 
+                AND req_method LIKE CONCAT('%', #{reqMethod}, '%')
+            </if>
+            <if test="reqUri != null and reqUri != ''"> 
+                AND req_uri LIKE CONCAT('%', #{reqUri}, '%')
+            </if>
+            <if test="ansType != null"> 
+                AND ans_type = #{ansType}
+            </if>
+            <if test="ansRateType != null"> 
+                AND ans_rate_type = #{ansRateType}
+            </if>
+            <if test="outQueue != null and outQueue != ''"> 
+                AND out_queue LIKE CONCAT('%', #{outQueue}, '%')
+            </if>
+        ORDER BY id DESC
+    </select>
+    
+</mapper>

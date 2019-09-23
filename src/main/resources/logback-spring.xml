@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<!--文件输出格式 -->
+	<property name="PATTERN" value="%-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) |-%-5level [%thread] %c [%L] -| %msg%n" />
+	<!-- 日志文件位置及名称 -->
+	<property name="LOG_DIR" value="logs"></property>
+	<property name="FILE_NAME" value="bkcc-logans"></property>
+	
+	<!-- 控制台输出 -->
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${PATTERN}</pattern>
+		</encoder>
+	</appender>
+	
+    <!-- 每天产生一个文件 -->
+	<appender name="FILE_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 文件路径 -->
+		<file>${LOG_DIR}/${FILE_NAME}.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- 文件名称 -->
+			<fileNamePattern>${LOG_DIR}/${FILE_NAME}-info.%d{yyyy-MM-dd}.log</fileNamePattern>
+              	<maxHistory>100</maxHistory>
+              	<!-- <cleanHistoryOnStart>true</cleanHistoryOnStart> -->
+              	<!-- <totalSizeCap>20KB</totalSizeCap> -->
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>${PATTERN}</pattern>
+		</layout>
+	</appender>
+	
+    <!-- 每天产生一个文件 == 简要日志 -->
+	<appender name="SIMP_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 文件路径 -->
+		<file>${LOG_DIR}/simp_log/simp-logans.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- 文件名称 -->
+			<fileNamePattern>${LOG_DIR}/simp_log/simp-logans.%d{yyyy-MM-dd}.log</fileNamePattern>
+              	<maxHistory>100</maxHistory>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>${PATTERN}</pattern>
+<!-- 			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS},%msg%n</pattern> -->
+		</layout>
+	</appender>
+    
+    <logger name="com.bkcc" level="debug"/>
+    
+    
+	<!-- 个人本地开发环境. -->
+    <springProfile name="yanfadev">
+        <root level="info">
+			<appender-ref ref="STDOUT" />
+		</root>
+    </springProfile>
+    
+   <!-- 研发环境. -->
+     <springProfile name="dev">
+	    <logger name="SIMP_LOG" level="info">
+			<appender-ref ref="SIMP_LOG" />
+	    </logger>
+        <root level="info">
+			<appender-ref ref="FILE_APPENDER" />
+		</root>
+    </springProfile>
+	
+	<!-- 测试环境. -->
+    <springProfile name="test">
+    	<logger name="SIMP_LOG" level="info">
+			<appender-ref ref="SIMP_LOG" />
+	    </logger>
+        <root level="info">
+			<appender-ref ref="FILE_APPENDER" />
+		</root>
+    </springProfile>
+	
+	<!-- 生产环境. -->
+    <springProfile name="pro">
+    	<logger name="SIMP_LOG" level="info">
+			<appender-ref ref="SIMP_LOG" />
+	    </logger>
+        <root level="info">
+			<appender-ref ref="FILE_APPENDER" />
+		</root>
+    </springProfile>
+</configuration>
