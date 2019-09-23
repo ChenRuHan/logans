@@ -29,11 +29,11 @@ public class QueryResHbaseEntity implements Serializable {
     private String rowKey;
 
     /**
-     * 【描 述】：参与分析的字段明文
+     * 【描 述】：占位用，暂时保留
      *
      *  @since  Aug 6, 2019 v1.0
      */
     @HBaseColumn
-    private String res;
+    private String r;
 
 }///:~

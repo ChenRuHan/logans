@@ -10,7 +10,7 @@ import com.bkcc.logans.entity.base.BaseEntity;
  *
  *  @author         陈汝晗
  *  @version        v1.0 新建
- *  @since          2019-09-23 10:59:26
+ *  @since          2019-09-23 17:24:57
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
@@ -23,39 +23,33 @@ public class TaskResEntity extends BaseEntity{
      */
     private static final long serialVersionUID = 1L;
     /**
+     * 【描 述】：任务执行单号
+     *
+     *  @since  2019-09-23 17:24:57
+     */
+    private Long orderNO;
+    /**
      * 【描 述】：日志分析任务ID
      *
-     *  @since  2019-09-23 10:59:26
+     *  @since  2019-09-23 17:24:57
      */
     private Long taskId;
     /**
      * 【描 述】：任务执行开始时间
      *
-     *  @since  2019-09-23 10:59:26
+     *  @since  2019-09-23 17:24:57
      */
     private String beginTime;
     /**
      * 【描 述】：任务执行结束时间
      *
-     *  @since  2019-09-23 10:59:26
+     *  @since  2019-09-23 17:24:57
      */
     private String endTime;
     /**
      * 【描 述】：错误码
      *
-     *  @since  2019-09-23 10:59:26
+     *  @since  2019-09-23 17:24:57
      */
     private Integer errorCode;
-    /**
-     * 【描 述】：错误日志
-     *
-     *  @since  2019-09-23 10:59:26
-     */
-    private String errorMsg;
-    /**
-     * 【描 述】：返回结果
-     *
-     *  @since  2019-09-23 10:59:26
-     */
-    private String resJson;
 }///:~

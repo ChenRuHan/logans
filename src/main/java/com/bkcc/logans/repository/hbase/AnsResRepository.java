@@ -1,11 +1,11 @@
 package com.bkcc.logans.repository.hbase;
 
 import com.bkcc.hbase.repository.AbstractHBaseRepository;
-import com.bkcc.logans.entity.hbase.QueryResHbaseEntity;
+import com.bkcc.logans.entity.hbase.AnsResHbaseEntity;
 import org.springframework.stereotype.Repository;
 
 /**
- * 【描 述】：HBASE日志查询结果接口
+ * 【描 述】：HBASE日志分析结果接口
  * 【环 境】：J2SE 1.8
  *
  *  @author         陈汝晗
@@ -13,6 +13,6 @@ import org.springframework.stereotype.Repository;
  *  @since          Aug 6, 2019 
  */
 @Repository
-public class QueryResRepository extends AbstractHBaseRepository<QueryResHbaseEntity>{
+public class AnsResRepository extends AbstractHBaseRepository<AnsResHbaseEntity>{
 
 }///:~

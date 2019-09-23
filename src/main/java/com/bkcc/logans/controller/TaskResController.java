@@ -27,7 +27,7 @@ import com.bkcc.logans.service.TaskResService;
  *
  *  @author         陈汝晗
  *  @version        v1.0 新建
- *  @since          2019-09-23 10:59:26
+ *  @since          2019-09-23 17:24:57
  */
 @RestController
 @Api(value = "日志分析任务结果表Controller")
@@ -37,7 +37,7 @@ public class TaskResController extends BaseController{
     /**
      * 【描 述】：日志分析任务结果表业务接口
      *
-     *  @since  2019-09-23 10:59:26
+     *  @since  2019-09-23 17:24:57
      */
     @Autowired
     private TaskResService taskResService;
@@ -45,30 +45,28 @@ public class TaskResController extends BaseController{
     /**
      * 【描 述】：查询日志分析任务结果表信息列表
      *
-     * @since  2019-09-23 10:59:26
+     * @since  2019-09-23 17:24:57
      */
     @ApiOperation(value = "查询日志分析任务结果表信息列表")
     @ApiImplicitParams({
         @ApiImplicitParam(paramType="body", name="taskRes", value="{"
             + "</br> pageNum : 当前页码--不传查询全部,"
             + "</br> pageSize : 每页大小--不传查询全部"
+            + "</br> orderNO : 任务执行单号,"
             + "</br> taskId : 日志分析任务ID,"
             + "</br> beginTime : 任务执行开始时间,"
             + "</br> endTime : 任务执行结束时间,"
             + "</br> errorCode : 错误码,"
-            + "</br> errorMsg : 错误日志,"
-            + "</br> resJson : 返回结果,"
             + "</br>}", dataType="TaskResEntity", required=true)
     })
     @ApiResponses({
         @ApiResponse(code = 200, message = "{</br> rows:[{"
             + "</br> id : 日志分析任务结果表ID,"
+            + "</br> orderNO : 任务执行单号,"
             + "</br> taskId : 日志分析任务ID,"
             + "</br> beginTime : 任务执行开始时间,"
             + "</br> endTime : 任务执行结束时间,"
             + "</br> errorCode : 错误码,"
-            + "</br> errorMsg : 错误日志,"
-            + "</br> resJson : 返回结果,"
             + "</br>}...], "
             + "</br> newPrimaryKeys : {},"
             + "</br> total:总数 </br>}")
@@ -89,18 +87,17 @@ public class TaskResController extends BaseController{
     /**
      * 【描 述】：添加、修改日志分析任务结果表信息
      *
-     * @since  2019-09-23 10:59:26
+     * @since  2019-09-23 17:24:57
      */
     @ApiOperation(value = "添加、修改日志分析任务结果表信息")
     @ApiImplicitParams({
         @ApiImplicitParam(paramType="body", name="taskRes", value="{"
                 + "</br> \"id\" : 主键ID，不传或-1代表新增,"
+                + "</br> \"orderNO\" : 任务执行单号,"
                 + "</br> \"taskId\" : 日志分析任务ID,"
                 + "</br> \"beginTime\" : 任务执行开始时间,"
                 + "</br> \"endTime\" : 任务执行结束时间,"
                 + "</br> \"errorCode\" : 错误码,"
-                + "</br> \"errorMsg\" : 错误日志,"
-                + "</br> \"resJson\" : 返回结果,"
                 + "</br>}", dataType="TaskResEntity", required=true)
     })
     @ApiResponses({
@@ -147,12 +144,11 @@ public class TaskResController extends BaseController{
     })
     @ApiResponses({
         @ApiResponse(code = 200, message = "{</br> rows:[{"
+                + "</br> orderNO : 任务执行单号,"
                 + "</br> taskId : 日志分析任务ID,"
                 + "</br> beginTime : 任务执行开始时间,"
                 + "</br> endTime : 任务执行结束时间,"
                 + "</br> errorCode : 错误码,"
-                + "</br> errorMsg : 错误日志,"
-                + "</br> resJson : 返回结果,"
             + "</br>}], </br> newPrimaryKeys : {}"
             + "</br>}" )
     })

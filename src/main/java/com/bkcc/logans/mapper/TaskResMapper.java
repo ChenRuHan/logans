@@ -9,7 +9,7 @@ import com.bkcc.logans.entity.TaskResEntity;
  *
  *  @author         陈汝晗
  *  @version        v1.0 新建
- *  @since          2019-09-23 10:59:26
+ *  @since          2019-09-23 17:24:57
  */
 public interface TaskResMapper {
 
@@ -17,7 +17,7 @@ public interface TaskResMapper {
      * 【描 述】：删除日志分析任务结果表信息
      *
      * @param id
-     * @since 2019-09-23 10:59:26
+     * @since 2019-09-23 17:24:57
      */
     void deleteTaskResById(Long id);
 
@@ -25,7 +25,7 @@ public interface TaskResMapper {
      * 【描 述】：添加日志分析任务结果表数据
      *
      * @param taskRes 实体类数据
-     * @since 2019-09-23 10:59:26
+     * @since 2019-09-23 17:24:57
      */
     void insertTaskRes(TaskResEntity taskRes);
 
@@ -33,7 +33,7 @@ public interface TaskResMapper {
      * 【描 述】：修改日志分析任务结果表数据
      *
      * @param taskRes 实体类数据
-     * @since 2019-09-23 10:59:26
+     * @since 2019-09-23 17:24:57
      */
     void updateTaskResById(TaskResEntity taskRes);
 
@@ -42,7 +42,7 @@ public interface TaskResMapper {
      *
      * @param taskRes 实体类数据
      * @return
-     * @since 2019-09-23 10:59:26
+     * @since 2019-09-23 17:24:57
      */
     List<TaskResEntity> selectTaskResList(TaskResEntity taskRes);
 
@@ -51,7 +51,7 @@ public interface TaskResMapper {
      *
      * @param id 主键
      * @return
-     * @since 2019-09-23 10:59:26
+     * @since 2019-09-23 17:24:57
      */
     TaskResEntity selectTaskResById(Long id);
 

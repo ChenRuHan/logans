@@ -4,9 +4,9 @@
 
     <insert id="insertTaskRes" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO logans_task_res
-            (task_id, begin_time, end_time, error_code, error_msg, res_json)
+            (order_no, task_id, begin_time, end_time, error_code)
         VALUES
-            (#{taskId}, #{beginTime}, #{endTime}, #{errorCode}, #{errorMsg}, #{resJson})
+            (#{orderNO}, #{taskId}, #{beginTime}, #{endTime}, #{errorCode})
     </insert>
     
     <delete id="deleteTaskResById">
@@ -17,6 +17,9 @@
     <update id="updateTaskResById">
         UPDATE logans_task_res 
         SET id = #{id}
+            <if test="orderNO != null"> 
+                , order_no = #{orderNO}
+            </if>
             <if test="taskId != null"> 
                 , task_id = #{taskId}
             </if>
@@ -29,25 +32,22 @@
             <if test="errorCode != null"> 
                 , error_code = #{errorCode}
             </if>
-            <if test="errorMsg != null and errorMsg != ''"> 
-                , error_msg = #{errorMsg}
-            </if>
-            <if test="resJson != null and resJson != ''"> 
-                , res_json = #{resJson}
-            </if>
         WHERE id = #{id}
     </update>
             
     <select id="selectTaskResById" resultType="com.bkcc.logans.entity.TaskResEntity">
-        SELECT id, task_id taskId, begin_time beginTime, end_time endTime, error_code errorCode, error_msg errorMsg, res_json resJson
+        SELECT id, order_no orderNO, task_id taskId, begin_time beginTime, end_time endTime, error_code errorCode
         FROM logans_task_res
         WHERE id = #{id}
     </select>
     
     <select id="selectTaskResList" resultType="com.bkcc.logans.entity.TaskResEntity">
-        SELECT id, task_id taskId, begin_time beginTime, end_time endTime, error_code errorCode, error_msg errorMsg, res_json resJson
+        SELECT id, order_no orderNO, task_id taskId, begin_time beginTime, end_time endTime, error_code errorCode
         FROM logans_task_res  
         WHERE 1 = 1 
+            <if test="orderNO != null"> 
+                AND order_no = #{orderNO}
+            </if>
             <if test="taskId != null"> 
                 AND task_id = #{taskId}
             </if>
@@ -59,12 +59,6 @@
             </if>
             <if test="errorCode != null"> 
                 AND error_code = #{errorCode}
-            </if>
-            <if test="errorMsg != null and errorMsg != ''"> 
-                AND error_msg LIKE CONCAT('%', #{errorMsg}, '%')
-            </if>
-            <if test="resJson != null and resJson != ''"> 
-                AND res_json LIKE CONCAT('%', #{resJson}, '%')
             </if>
         ORDER BY id DESC
     </select>

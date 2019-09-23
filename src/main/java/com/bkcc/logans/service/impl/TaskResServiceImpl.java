@@ -16,7 +16,7 @@ import com.bkcc.logans.service.TaskResService;
  *
  *  @author         陈汝晗
  *  @version        v1.0 新建
- *  @since          2019-09-23 10:59:26
+ *  @since          2019-09-23 17:24:57
  */
 @Service
 public class TaskResServiceImpl implements TaskResService{
@@ -24,7 +24,7 @@ public class TaskResServiceImpl implements TaskResService{
     /**
      * 【描 述】：日志分析任务结果表Mapper接口
      *
-     *  @since  2019-09-23 10:59:26 v1.0
+     *  @since  2019-09-23 17:24:57 v1.0
      */
     @Autowired
     private TaskResMapper taskResMapper;
@@ -32,7 +32,7 @@ public class TaskResServiceImpl implements TaskResService{
     /**
      * 【描 述】：添加或修改数据
      *
-     * @since 2019-09-23 10:59:26
+     * @since 2019-09-23 17:24:57
      * @see com.bkcc.logans.service.TaskResService#insertOrUpdate(com.bkcc.logans.entity.TaskResEntity)
      */
     @Override
@@ -47,7 +47,7 @@ public class TaskResServiceImpl implements TaskResService{
     /**
      * 【描 述】：删除日志分析任务结果表信息
      *
-     * @since 2019-09-23 10:59:26
+     * @since 2019-09-23 17:24:57
      * @see com.bkcc.logans.service.TaskResService#deleteTaskResById(java.lang.Long)
      */
     @Override
@@ -58,7 +58,7 @@ public class TaskResServiceImpl implements TaskResService{
     /**
      * 【描 述】：查询日志分析任务结果表信息列表
      *
-     * @since 2019-09-23 10:59:26
+     * @since 2019-09-23 17:24:57
      * @see com.bkcc.logans.service.TaskResService#selectTaskResList(com.bkcc.logans.entity.TaskResEntity)
      */
     @Override
@@ -76,7 +76,7 @@ public class TaskResServiceImpl implements TaskResService{
     /**
      * 【描 述】：查询单个日志分析任务结果表信息
      *
-     * @since 2019-09-23 10:59:26
+     * @since 2019-09-23 17:24:57
      * @see com.bkcc.logans.service.TaskResService#selectTaskResById(java.lang.Long)
      */
     @Override

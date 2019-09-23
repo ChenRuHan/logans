@@ -37,7 +37,7 @@ public class TaskHandler implements Runnable{
         Long tl = System.currentTimeMillis();
         Long taskNO = UniqueIdUtil.genId();
         try {
-            actuator.setTaskNO(taskNO);
+            actuator.setOrderNO(taskNO);
             actuator.setExeBeginTime(DateTimeUtils.formatDate());
             actuator.preExecute();
             log.debug("# begin执行任务taskNO:{}, {}", taskNO, task);

@@ -7,8 +7,10 @@ import com.bkcc.logans.entity.FieldEntity;
 import com.bkcc.logans.entity.FieldEnumEntity;
 import com.bkcc.logans.entity.TaskEntity;
 import com.bkcc.logans.entity.TaskResEntity;
+import com.bkcc.logans.entity.hbase.AnsResHbaseEntity;
 import com.bkcc.logans.entity.hbase.QueryResHbaseEntity;
 import com.bkcc.logans.enums.CalendarEnum;
+import com.bkcc.logans.repository.hbase.AnsResRepository;
 import com.bkcc.logans.repository.hbase.QueryResRepository;
 import com.bkcc.logans.service.FieldService;
 import com.bkcc.logans.service.TaskResService;
@@ -66,6 +68,8 @@ public class LogansTaskActuator extends AbstractTaskActuator {
     private FieldService fieldService;
     @Autowired
     private QueryResRepository queryResRepository;
+    @Autowired
+    private AnsResRepository ansResRepository;
 
     @Value("elastic-search.ip")
     private String ip;
@@ -88,7 +92,7 @@ public class LogansTaskActuator extends AbstractTaskActuator {
             log.debug("# 没有需要分析的列,直接返回, taskId:{}", taskEntity.getId());
             return null;
         }
-        String reverseNO = StringUtils.reverse(getTaskNO()+"");
+        String reverseOrderNO = StringUtils.reverse(getOrderNO()+"");
         String url = ElasticSearchUtils.getSimpleLogEsUrl(taskEntity.getModuleName(), ip, port);
         Map<String, Object> paramMap = ElasticSearchUtils.createParam(taskEntity);
         List<JSONObject> list = ElasticSearchUtils.querySimpleLogList(url, paramMap);
@@ -120,12 +124,13 @@ public class LogansTaskActuator extends AbstractTaskActuator {
                 json.put(key, value);
                 fieldSb.append(value);
             }
+            json.put("_count", 1);
             returnJsonList.add(json);
             QueryResHbaseEntity taskResHbaseEntity = new QueryResHbaseEntity();
             String rowKey = EncryptAndDecryptUtil.encrypt(fieldSb.toString());
             value2JsonMap.put(rowKey, json);
-            taskResHbaseEntity.setRowKey(reverseNO + "-" + rowKey + "-" + HBaseUtil.fillKey(i, 6));
-            taskResHbaseEntity.setRes(1+"");
+            taskResHbaseEntity.setRowKey(reverseOrderNO + "-" + rowKey + "-" + HBaseUtil.fillKey(i, 6));
+            taskResHbaseEntity.setR("1");
             taskResHbaseList.add(taskResHbaseEntity);
         }
         queryResRepository.save(taskResHbaseList);
@@ -134,8 +139,8 @@ public class LogansTaskActuator extends AbstractTaskActuator {
         }
 
         for (String key : value2JsonMap.keySet()) {
-            String beginRow = reverseNO + "-" + key + "-000000";
-            String endRow = reverseNO + "-" + key + "-999999";
+            String beginRow = reverseOrderNO + "-" + key + "-000000";
+            String endRow = reverseOrderNO + "-" + key + "-999999";
             long c = queryResRepository.count(beginRow, endRow);
             JSONObject json = value2JsonMap.get(key);
             json.put("_count", c);
@@ -155,6 +160,9 @@ public class LogansTaskActuator extends AbstractTaskActuator {
      */
     @Override
     public void afterExecute(Object res, Exception e) {
+        if (res == null) {
+            res = new Object();
+        }
         TaskEntity taskEntity = getTaskEntity();
         /*
             通过mq通知分析结果
@@ -162,7 +170,7 @@ public class LogansTaskActuator extends AbstractTaskActuator {
         try {
             if (StringUtils.isNotBlank(taskEntity.getOutQueue())) {
                 Destination destination = new ActiveMQQueue(taskEntity.getOutQueue());
-                jmsTemplate.convertAndSend(destination, res);
+                jmsTemplate.convertAndSend(destination, JSONObject.toJSONString(res));
             }
         } catch (Exception e1) {
             log.error(e1.getMessage(), e1);
@@ -256,17 +264,19 @@ public class LogansTaskActuator extends AbstractTaskActuator {
     private void recordResult(TaskEntity taskEntity, Object res, Exception e) {
         TaskResEntity taskRes = new TaskResEntity();
         taskRes.setTaskId(taskEntity.getId());
+        taskRes.setOrderNO(getOrderNO());
         taskRes.setBeginTime(getExeBeginTime());
         taskRes.setEndTime(getExeEndTime());
         taskRes.setErrorCode(0);
         if (e != null) {
             taskRes.setErrorCode(500);
-            taskRes.setErrorMsg(e.getMessage());
-        }
-        if (res != null) {
-            taskRes.setResJson(JSONObject.toJSONString(res));
         }
         taskResService.insertOrUpdate(taskRes);
+
+        AnsResHbaseEntity ansResHbaseEntity = new AnsResHbaseEntity();
+        ansResHbaseEntity.setRowKey(StringUtils.reverse(getOrderNO()+""));
+        ansResHbaseEntity.setRes(JSONObject.toJSONString(res));
+        ansResRepository.save(ansResHbaseEntity);
     }
 }///:~
 
