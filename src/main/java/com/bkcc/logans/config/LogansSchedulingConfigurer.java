@@ -30,8 +30,8 @@ public class LogansSchedulingConfigurer implements SchedulingConfigurer {
     @Autowired
     private TaskService taskService;
 
-    @Value("task.pool-size")
-    private Integer pollSize;
+    @Value("${task.pool-size}")
+    private int poolSize;
 
     private ScheduledTaskRegistrar taskRegistrar;
 
@@ -45,7 +45,7 @@ public class LogansSchedulingConfigurer implements SchedulingConfigurer {
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
-        taskScheduler.setPoolSize(pollSize);
+        taskScheduler.setPoolSize(poolSize);
         taskScheduler.initialize();
         taskRegistrar.setTaskScheduler(taskScheduler);
         this.taskRegistrar = taskRegistrar;

@@ -3,11 +3,10 @@ package com.bkcc.logans.dispatch;
 import com.bkcc.logans.constant.RedisKeyConstant;
 import com.bkcc.logans.dispatch.abs.AbstractTaskDispatch;
 import com.bkcc.logans.util.ComputerUtils;
+import com.bkcc.util.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -23,8 +22,9 @@ import java.util.Set;
 @Component
 public class PollTaskDispatch extends AbstractTaskDispatch {
 
+
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisUtil redisUtil;
 
     /**
      * 【描 述】：轮询算法
@@ -35,31 +35,30 @@ public class PollTaskDispatch extends AbstractTaskDispatch {
      */
     @Override
     public boolean canExecute(Long taskId) {
-        HashOperations<String, String, String> redisHash = redisTemplate.opsForHash();
-        String lastExeIp = redisHash.get(RedisKeyConstant.TASK_KEY, taskId + "");
+        String lastExeIp = (String) redisUtil.hmGet(RedisKeyConstant.TASK_KEY, taskId);
         String nextIp = "";
         if (StringUtils.isBlank(lastExeIp)) {
-            Set<String> keys = redisHash.keys(RedisKeyConstant.IP_KEY);
-            for (String key : keys) {
-                nextIp = key;
+            Set<Object> keys = redisUtil.hmKeys(RedisKeyConstant.IP_KEY);
+            for (Object key : keys) {
+                nextIp = key.toString();
                 continue;
             }
         } else {
-            nextIp = redisHash.get(RedisKeyConstant.IP_KEY, lastExeIp);
+            nextIp = (String) redisUtil.hmGet(RedisKeyConstant.IP_KEY, lastExeIp);
             /*
                 如果查询不到，证明该节点已经下线，重新轮询。
              */
             if (StringUtils.isBlank(nextIp)) {
-                Set<String> keys = redisHash.keys(RedisKeyConstant.IP_KEY);
-                for (String key : keys) {
-                    nextIp = key;
+                Set<Object> keys = redisUtil.hmKeys(RedisKeyConstant.IP_KEY);
+                for (Object key : keys) {
+                    nextIp = key.toString();
                     continue;
                 }
             }
         }
         Set<String> ipSet = ComputerUtils.getIPSet();
         if (ipSet.contains(nextIp)) {
-            redisHash.put(RedisKeyConstant.TASK_KEY, taskId + "", nextIp);
+            redisUtil.hmSet(RedisKeyConstant.TASK_KEY, taskId, nextIp);
             return true;
         }
         return false;

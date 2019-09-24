@@ -2,10 +2,12 @@ package com.bkcc.logans.actuator;
 
 import com.bkcc.logans.actuator.abs.AbstractTaskActuator;
 import com.bkcc.logans.config.LogansSchedulingConfigurer;
+import com.bkcc.logans.constant.RedisKeyConstant;
 import com.bkcc.logans.dispatch.abs.AbstractTaskDispatch;
 import com.bkcc.logans.entity.TaskEntity;
 import com.bkcc.logans.handler.TaskHandler;
 import com.bkcc.logans.service.TaskService;
+import com.bkcc.util.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,6 +43,8 @@ public class InitTaskActuator extends AbstractTaskActuator {
      */
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Autowired
     private LogansSchedulingConfigurer logansSchedulingConfigurer;
@@ -63,11 +67,15 @@ public class InitTaskActuator extends AbstractTaskActuator {
     @Override
     public Object execute() {
         ScheduledTaskRegistrar taskRegistrar = logansSchedulingConfigurer.getTaskRegistrar();
-        Set<Long> taskIdSet = new HashSet<>();
+        if (taskRegistrar == null) {
+            return null;
+        }
         /*
             添加新任务
          */
-        for (TaskEntity taskEntity : getTaskList()) {
+        List<TaskEntity> taskList = taskService.selectTaskList(null).getList();
+        Set<Long> taskIdSet = new HashSet<>();
+        for (TaskEntity taskEntity : taskList) {
             Long taskId = taskEntity.getId();
             taskIdSet.add(taskId);
             if (SCHEDULED_TASK_MAP.containsKey(taskId)) {
@@ -86,23 +94,11 @@ public class InitTaskActuator extends AbstractTaskActuator {
         for (Long taskId : SCHEDULED_TASK_MAP.keySet()) {
             if (!taskIdSet.contains(taskId)) {
                 log.debug("# 移除已经删除的任务：taskId: {}", taskId);
+                redisUtil.hmDel(RedisKeyConstant.TASK_KEY, taskId);
                 SCHEDULED_TASK_MAP.get(taskId).cancel();
             }
         }
         return null;
-    }
-
-    private List<TaskEntity> getTaskList() {
-        return taskService.selectTaskList(null).getList();
-//        List<TaskEntity> list = new ArrayList<>();
-//        for (int i = 0; i < 5; i++) {
-//            TaskEntity taskEntity = new TaskEntity();
-//            taskEntity.setId(i + 1L);
-//            taskEntity.setAnsRateType(1);
-//            taskEntity.setTaskName("测试任务id" + taskEntity.getId());
-//            list.add(taskEntity);
-//        }
-//        return list;
     }
 
 }///:~

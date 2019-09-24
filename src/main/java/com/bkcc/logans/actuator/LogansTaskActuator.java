@@ -39,8 +39,8 @@ import java.util.Map;
  * @version v1.0
  * @since 2019-09-21 10:16
  */
-@Component
 @Slf4j
+@Component
 public class LogansTaskActuator extends AbstractTaskActuator {
 
     /**
@@ -71,11 +71,11 @@ public class LogansTaskActuator extends AbstractTaskActuator {
     @Autowired
     private AnsResRepository ansResRepository;
 
-    @Value("elastic-search.ip")
+    @Value("${elastic-search.ip}")
     private String ip;
 
-    @Value("elastic-search.port")
-    private Integer port;
+    @Value("${elastic-search.port}")
+    private int port;
 
     /**
      * 【描 述】：任务执行方法

@@ -4,14 +4,13 @@ import com.bkcc.core.data.ViewData;
 import com.bkcc.logans.annotation.MySyncLock;
 import com.bkcc.logans.constant.RedisKeyConstant;
 import com.bkcc.logans.handler.InitTaskHandler;
+import com.bkcc.util.redis.RedisUtil;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import com.netflix.discovery.shared.Application;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,7 +45,7 @@ public class InitTaskController {
     private EurekaClient eurekaClient;
 
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisUtil redisUtil;
 
     /**
      * 【描 述】：初始化日志分析任务配置
@@ -85,8 +84,7 @@ public class InitTaskController {
         if (ipList.isEmpty()) {
             return;
         }
-        HashOperations<String, String, String> redos = redisTemplate.opsForHash();
-        redisTemplate.delete(RedisKeyConstant.IP_KEY);
+        redisUtil.remove(RedisKeyConstant.IP_KEY);
         for (int i = 0; i < ipList.size(); i++) {
             String cur = ipList.get(i);
             String next;
@@ -95,9 +93,9 @@ public class InitTaskController {
             } else {
                 next = ipList.get(i + 1);
             }
-            redos.put(RedisKeyConstant.IP_KEY, cur, next);
+            redisUtil.hmSet(RedisKeyConstant.IP_KEY, cur, next);
         }
-        redisTemplate.expire(RedisKeyConstant.IP_KEY, 60, TimeUnit.SECONDS);
+        redisUtil.expire(RedisKeyConstant.IP_KEY, 60, TimeUnit.SECONDS);
 
     }
 }///:~
