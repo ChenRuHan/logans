@@ -21,6 +21,8 @@ task:
   pool-size: 30
 
 # 链接ES参数
+# 生产环境 ip:172.17.0.61 port:9200
+# 研发环境 ip:192.158.10.40 port:9201
 elastic-search:
   ip: 192.158.10.40
   port: 9201
