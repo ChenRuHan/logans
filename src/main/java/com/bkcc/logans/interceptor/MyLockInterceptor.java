@@ -56,7 +56,7 @@ public class MyLockInterceptor {
      */
     @Around("@annotation(com.bkcc.logans.annotation.MySyncLock)")
     @Order(Integer.MAX_VALUE - 98)
-    public Object around(ProceedingJoinPoint pjp) {
+    public Object around(ProceedingJoinPoint pjp) throws Throwable {
         Signature signature = pjp.getSignature();
         MethodSignature methodSignature = (MethodSignature) signature;
         Object[] args = pjp.getArgs();
@@ -97,6 +97,7 @@ public class MyLockInterceptor {
         try {
             result = pjp.proceed();
         } catch (Throwable e) {
+            throw e;
         } finally {
             redisUtil.remove(key);
             if (debug) {
