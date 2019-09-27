@@ -66,8 +66,9 @@ public class ElasticSearchUtils {
 	 * @since Apr 29, 2019
 	 */
 	public static List<JSONObject> querySimpleLogList(String url, Map<String, Object> params) {
+	    long l = System.currentTimeMillis();
 		JSONObject res = JSONObject.parseObject(MyHttpUtil.sendPostJson(params, url));
-		log.debug("# 通过ES查询简要日志\nurl==>{}\nparamMap==>{}\nres==>{}", url ,JSONObject.toJSONString(params), res);
+		log.debug("# 通过ES查询简要日志\nurl==>{}\nparamMap==>{}\nres==>{}\n耗时==>{}毫秒", url ,JSONObject.toJSONString(params), res, (System.currentTimeMillis() - l));
 		return changeRes2List(res);
 	}
 
@@ -99,11 +100,11 @@ public class ElasticSearchUtils {
         Map<String, Object> timeRangeMap = new HashMap<>();
         timeRangeMap.put("gte", taskEntity.getBeginTime());
         timeRangeMap.put("lte", taskEntity.getEndTime());
-        Map<String, Object> matchMap = new HashMap<>();
-        matchMap.put("uri.keyword", taskEntity.getReqUri());
-        matchMap.put("method.keyword", taskEntity.getReqMethod());
         Map<String, Object> boolMap = new HashMap<>();
-        boolMap.put("must", MapUtils.createNewMap("match", matchMap));
+        List<Map<String, Object>> mustList = new ArrayList<>();
+        mustList.add(MapUtils.createNewMap("match", MapUtils.createNewMap("uri.keyword", taskEntity.getReqUri())));
+        mustList.add(MapUtils.createNewMap("match", MapUtils.createNewMap("req.keyword", taskEntity.getReqMethod())));
+        boolMap.put("must", mustList);
         boolMap.put("filter", MapUtils.createNewMap("range", MapUtils.createNewMap("timestamp.keyword", timeRangeMap)));
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("bool", boolMap);

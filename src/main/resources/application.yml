@@ -22,10 +22,11 @@ task:
 
 # 链接ES参数
 # 生产环境 ip:172.17.0.61 port:9200
-# 研发环境 ip:192.158.10.40 port:9201
+# 测试环境 ip:192.168.100.40 port:9201
+# 研发环境 ip:192.168.100.30 port:9200
 elastic-search:
-  ip: 192.158.10.40
-  port: 9201
+  ip: 192.168.100.30
+  port: 9200
 
 # hbase配置信息
 # 生产环境：hb-2zejh008601i8n321-001.hbase.rds.aliyuncs.com

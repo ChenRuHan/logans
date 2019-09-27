@@ -1,15 +1,12 @@
 package com.bkcc.logans.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import com.bkcc.core.data.ViewData;
+import com.bkcc.logans.actuator.abs.AbstractTaskActuator;
 import com.bkcc.logans.controller.base.BaseController;
+import com.bkcc.logans.dispatch.abs.AbstractTaskDispatch;
+import com.bkcc.logans.entity.TaskEntity;
+import com.bkcc.logans.handler.TaskHandler;
+import com.bkcc.logans.service.TaskService;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -17,9 +14,15 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
-import com.bkcc.logans.entity.TaskEntity;
-import com.bkcc.logans.service.TaskService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 【描 述】：日志分析任务配置表Controller
@@ -41,6 +44,8 @@ public class TaskController extends BaseController{
      */
     @Autowired
     private TaskService taskService;
+
+
     
     /**
      * 【描 述】：查询日志分析任务配置表信息列表
@@ -165,6 +170,25 @@ public class TaskController extends BaseController{
         TaskEntity taskEntity = taskService.selectTaskById(taskId);
         return ViewData.ok(taskEntity);
     }
-    
+
+
+
+    @Autowired
+    @Qualifier("pollTaskDispatch")
+    private AbstractTaskDispatch taskDispatch;
+
+    @Autowired
+    @Qualifier("logansTaskActuator")
+    private AbstractTaskActuator actuator;
+
+
+
+    @GetMapping("/{taskId}/trigger")
+    public ViewData trigger(@PathVariable Long taskId) {
+        actuator.setTaskEntity(taskService.selectTaskById(taskId));
+        TaskHandler taskHandler = new TaskHandler(taskDispatch, actuator);
+        new Thread(taskHandler).start();
+        return ViewData.ok();
+    }
     
 }///：～

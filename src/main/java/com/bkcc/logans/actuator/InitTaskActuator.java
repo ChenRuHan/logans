@@ -11,6 +11,7 @@ import com.bkcc.util.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
@@ -53,9 +54,10 @@ public class InitTaskActuator extends AbstractTaskActuator {
     @Qualifier("pollTaskDispatch")
     private AbstractTaskDispatch taskDispatch;
 
+
+
     @Autowired
-    @Qualifier("logansTaskActuator")
-    private AbstractTaskActuator actuator;
+    private ApplicationContext applicationContext;
 
     /**
      * 【描 述】：执行初始化定时任务任务方法
@@ -81,7 +83,7 @@ public class InitTaskActuator extends AbstractTaskActuator {
             if (SCHEDULED_TASK_MAP.containsKey(taskId)) {
                 continue;
             }
-            AbstractTaskActuator actuator = new LogansTaskActuator();
+            AbstractTaskActuator actuator = applicationContext.getBean("logansTaskActuator", AbstractTaskActuator.class);
             actuator.setTaskEntity(taskEntity);
             TaskHandler taskHandler = new TaskHandler(taskDispatch, actuator);
             CronTask cronTask = new CronTask(new Thread(taskHandler), taskEntity.getAnsCronByAnsRateType());
