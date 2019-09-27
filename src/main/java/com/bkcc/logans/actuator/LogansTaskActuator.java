@@ -170,10 +170,7 @@ public class LogansTaskActuator extends AbstractTaskActuator {
             通过mq通知分析结果
          */
         try {
-            if (StringUtils.isNotBlank(taskEntity.getOutQueue())) {
-                Destination destination = new ActiveMQQueue(taskEntity.getOutQueue());
-                jmsTemplate.convertAndSend(destination, JSONObject.toJSONString(res));
-            }
+            notice(taskEntity, res, e);
         } catch (Exception e1) {
             log.error(e1.getMessage(), e1);
         }
@@ -267,8 +264,8 @@ public class LogansTaskActuator extends AbstractTaskActuator {
         TaskResEntity taskRes = new TaskResEntity();
         taskRes.setTaskId(taskEntity.getId());
         taskRes.setOrderNO(getOrderNO());
-        taskRes.setBeginTime(getExeBeginTime());
-        taskRes.setEndTime(getExeEndTime());
+        taskRes.setBeginTime(taskEntity.getBeginTime());
+        taskRes.setEndTime(taskEntity.getEndTime());
         taskRes.setErrorCode(0);
         if (e != null) {
             taskRes.setErrorCode(500);
@@ -280,5 +277,40 @@ public class LogansTaskActuator extends AbstractTaskActuator {
         ansResHbaseEntity.setRes(JSONObject.toJSONString(res));
         ansResRepository.save(ansResHbaseEntity);
     }
+
+
+    /**
+     * 【描 述】：通过mq通知分析结果
+     *
+     * @return void
+     * @author 陈汝晗
+     * @since 2019/9/27 13:57
+     */
+    private void notice(TaskEntity taskEntity, Object res, Exception e) {
+        if (StringUtils.isBlank(taskEntity.getOutQueue())) {
+            return;
+        }
+        Destination destination = new ActiveMQQueue(taskEntity.getOutQueue());
+        JSONObject taskJson = new JSONObject();
+        taskJson.put("orderNO", getOrderNO());
+        taskJson.put("taskId", taskEntity.getId());
+        taskJson.put("beginTime", taskEntity.getBeginTime());
+        taskJson.put("endTime", taskEntity.getEndTime());
+        taskJson.put("taskName", taskEntity.getTaskName());
+        taskJson.put("moduleName", taskEntity.getModuleName());
+        taskJson.put("reqUri", taskEntity.getReqUri());
+        taskJson.put("reqMethod", taskEntity.getReqMethod());
+        taskJson.put("ansRateType", taskEntity.getAnsRateType());
+        taskJson.put("ansType", taskEntity.getAnsType());
+        taskJson.put("outQueue", taskEntity.getOutQueue());
+
+        JSONObject json = new JSONObject();
+        json.put("taskInfo", taskJson);
+        json.put("result", res);
+        json.put("errorCode", e == null ? 0 : 500);
+        json.put("errorMessage", e == null ? "" : e.getMessage());
+        jmsTemplate.convertAndSend(destination, json.toJSONString());
+    }
+
 }///:~
 
