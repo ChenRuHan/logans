@@ -4,9 +4,9 @@
 
     <insert id="insertFieldEnum" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO logans_field2_enum
-            (task_id, file_id, enum_value, allow_regex)
+            (task_id, field_id, enum_value, allow_regex)
         VALUES
-            (#{taskId}, #{fileId}, #{enumValue}, #{allowRegex})
+            (#{taskId}, #{fieldId}, #{enumValue}, #{allowRegex})
     </insert>
     
     <delete id="deleteFieldEnumById">
@@ -20,8 +20,8 @@
             <if test="taskId != null"> 
                 , task_id = #{taskId}
             </if>
-            <if test="fileId != null"> 
-                , file_id = #{fileId}
+            <if test="fieldId != null">
+                , field_id = #{fieldId}
             </if>
             <if test="enumValue != null and enumValue != ''"> 
                 , enum_value = #{enumValue}
@@ -33,20 +33,20 @@
     </update>
             
     <select id="selectFieldEnumById" resultType="com.bkcc.logans.entity.FieldEnumEntity">
-        SELECT id, task_id taskId, file_id fileId, enum_value enumValue, allow_regex allowRegex
+        SELECT id, task_id taskId, field_id fieldId, enum_value enumValue, allow_regex allowRegex
         FROM logans_field2_enum
         WHERE id = #{id}
     </select>
     
     <select id="selectFieldEnumList" resultType="com.bkcc.logans.entity.FieldEnumEntity">
-        SELECT id, task_id taskId, file_id fileId, enum_value enumValue, allow_regex allowRegex
+        SELECT id, task_id taskId, field_id fieldId, enum_value enumValue, allow_regex allowRegex
         FROM logans_field2_enum  
         WHERE 1 = 1 
             <if test="taskId != null"> 
                 AND task_id = #{taskId}
             </if>
-            <if test="fileId != null"> 
-                AND file_id = #{fileId}
+            <if test="fieldId != null">
+                AND field_id = #{fieldId}
             </if>
             <if test="enumValue != null and enumValue != ''"> 
                 AND enum_value LIKE CONCAT('%', #{enumValue}, '%')

@@ -53,16 +53,16 @@ public class FieldController extends BaseController{
             + "</br> pageNum : 当前页码--不传查询全部,"
             + "</br> pageSize : 每页大小--不传查询全部"
             + "</br> taskId : 日志分析任务ID,"
-            + "</br> fileKey : 字段英文KEY，对用存储到ES中的KEY值,"
-            + "</br> fileRemark : 字段中文描述,"
+            + "</br> fieldKey : 字段英文KEY，对用存储到ES中的KEY值,"
+            + "</br> fieldRemark : 字段中文描述,"
             + "</br>}", dataType="FieldEntity", required=true)
     })
     @ApiResponses({
         @ApiResponse(code = 200, message = "{</br> rows:[{"
             + "</br> id : 日志分析模块字段表ID,"
             + "</br> taskId : 日志分析任务ID,"
-            + "</br> fileKey : 字段英文KEY，对用存储到ES中的KEY值,"
-            + "</br> fileRemark : 字段中文描述,"
+            + "</br> fieldKey : 字段英文KEY，对用存储到ES中的KEY值,"
+            + "</br> fieldRemark : 字段中文描述,"
             + "</br>}...], "
             + "</br> newPrimaryKeys : {},"
             + "</br> total:总数 </br>}")
@@ -90,8 +90,8 @@ public class FieldController extends BaseController{
         @ApiImplicitParam(paramType="body", name="field", value="{"
                 + "</br> \"id\" : 主键ID，不传或-1代表新增,"
                 + "</br> \"taskId\" : 日志分析任务ID,"
-                + "</br> \"fileKey\" : 字段英文KEY，对用存储到ES中的KEY值,"
-                + "</br> \"fileRemark\" : 字段中文描述,"
+                + "</br> \"fieldKey\" : 字段英文KEY，对用存储到ES中的KEY值,"
+                + "</br> \"fieldRemark\" : 字段中文描述,"
                 + "</br>}", dataType="FieldEntity", required=true)
     })
     @ApiResponses({
@@ -139,8 +139,8 @@ public class FieldController extends BaseController{
     @ApiResponses({
         @ApiResponse(code = 200, message = "{</br> rows:[{"
                 + "</br> taskId : 日志分析任务ID,"
-                + "</br> fileKey : 字段英文KEY，对用存储到ES中的KEY值,"
-                + "</br> fileRemark : 字段中文描述,"
+                + "</br> fieldKey : 字段英文KEY，对用存储到ES中的KEY值,"
+                + "</br> fieldRemark : 字段中文描述,"
             + "</br>}], </br> newPrimaryKeys : {}"
             + "</br>}" )
     })

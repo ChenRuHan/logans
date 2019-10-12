@@ -111,7 +111,7 @@ public class FieldServiceImpl implements FieldService{
         FieldEnumEntity fieldEnumEntity = new FieldEnumEntity();
         fieldEnumEntity.setTaskId(taskId);
         for (FieldEnumEntity enumEntity : fieldEnumMapper.selectFieldEnumList(fieldEnumEntity)) {
-            Long key = enumEntity.getFileId();
+            Long key = enumEntity.getFieldId();
             List<FieldEnumEntity> value = fieldenListMap.containsKey(key) ? fieldenListMap.get(key) : new ArrayList<>();
             value.add(enumEntity);
             fieldenListMap.put(key, value);

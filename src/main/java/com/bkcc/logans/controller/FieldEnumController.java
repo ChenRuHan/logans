@@ -53,7 +53,7 @@ public class FieldEnumController extends BaseController{
             + "</br> pageNum : 当前页码--不传查询全部,"
             + "</br> pageSize : 每页大小--不传查询全部"
             + "</br> taskId : 日志分析任务ID,"
-            + "</br> fileId : 字段ID,"
+            + "</br> fieldId : 字段ID,"
             + "</br> enumValue : 字段对应枚举值,"
             + "</br> allowRegex : 允许范围内的值正则表达式,"
             + "</br>}", dataType="FieldEnumEntity", required=true)
@@ -62,7 +62,7 @@ public class FieldEnumController extends BaseController{
         @ApiResponse(code = 200, message = "{</br> rows:[{"
             + "</br> id : 日志分析模块字段枚举表ID,"
             + "</br> taskId : 日志分析任务ID,"
-            + "</br> fileId : 字段ID,"
+            + "</br> fieldId : 字段ID,"
             + "</br> enumValue : 字段对应枚举值,"
             + "</br> allowRegex : 允许范围内的值正则表达式,"
             + "</br>}...], "
@@ -92,7 +92,7 @@ public class FieldEnumController extends BaseController{
         @ApiImplicitParam(paramType="body", name="fieldEnum", value="{"
                 + "</br> \"id\" : 主键ID，不传或-1代表新增,"
                 + "</br> \"taskId\" : 日志分析任务ID,"
-                + "</br> \"fileId\" : 字段ID,"
+                + "</br> \"fieldId\" : 字段ID,"
                 + "</br> \"enumValue\" : 字段对应枚举值,"
                 + "</br> \"allowRegex\" : 允许范围内的值正则表达式,"
                 + "</br>}", dataType="FieldEnumEntity", required=true)
@@ -142,7 +142,7 @@ public class FieldEnumController extends BaseController{
     @ApiResponses({
         @ApiResponse(code = 200, message = "{</br> rows:[{"
                 + "</br> taskId : 日志分析任务ID,"
-                + "</br> fileId : 字段ID,"
+                + "</br> fieldId : 字段ID,"
                 + "</br> enumValue : 字段对应枚举值,"
                 + "</br> allowRegex : 允许范围内的值正则表达式,"
             + "</br>}], </br> newPrimaryKeys : {}"

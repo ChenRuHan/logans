@@ -33,7 +33,7 @@ public class FieldEnumEntity extends BaseEntity{
      *
      *  @since  2019-09-20 15:28:26
      */
-    private Long fileId;
+    private Long fieldId;
     /**
      * 【描 述】：字段对应枚举值
      *

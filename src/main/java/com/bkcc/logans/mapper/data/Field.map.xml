@@ -4,9 +4,9 @@
 
     <insert id="insertField" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO logans_field
-            (task_id, file_key, file_remark)
+            (task_id, field_key, field_remark)
         VALUES
-            (#{taskId}, #{fileKey}, #{fileRemark})
+            (#{taskId}, #{fieldKey}, #{fieldRemark})
     </insert>
     
     <delete id="deleteFieldById">
@@ -20,33 +20,33 @@
             <if test="taskId != null"> 
                 , task_id = #{taskId}
             </if>
-            <if test="fileKey != null and fileKey != ''"> 
-                , file_key = #{fileKey}
+            <if test="fieldKey != null and fieldKey != ''">
+                , field_key = #{fieldKey}
             </if>
-            <if test="fileRemark != null and fileRemark != ''"> 
-                , file_remark = #{fileRemark}
+            <if test="fieldRemark != null and fieldRemark != ''">
+                , field_remark = #{fieldRemark}
             </if>
         WHERE id = #{id}
     </update>
             
     <select id="selectFieldById" resultType="com.bkcc.logans.entity.FieldEntity">
-        SELECT id, task_id taskId, file_key fileKey, file_remark fileRemark
+        SELECT id, task_id taskId, field_key fieldKey, field_remark fieldRemark
         FROM logans_field
         WHERE id = #{id}
     </select>
     
     <select id="selectFieldList" resultType="com.bkcc.logans.entity.FieldEntity">
-        SELECT id, task_id taskId, file_key fileKey, file_remark fileRemark
+        SELECT id, task_id taskId, field_key fieldKey, field_remark fieldRemark
         FROM logans_field  
         WHERE 1 = 1 
             <if test="taskId != null"> 
                 AND task_id = #{taskId}
             </if>
-            <if test="fileKey != null and fileKey != ''"> 
-                AND file_key LIKE CONCAT('%', #{fileKey}, '%')
+            <if test="fieldKey != null and fieldKey != ''">
+                AND field_key LIKE CONCAT('%', #{fieldKey}, '%')
             </if>
-            <if test="fileRemark != null and fileRemark != ''"> 
-                AND file_remark LIKE CONCAT('%', #{fileRemark}, '%')
+            <if test="fieldRemark != null and fieldRemark != ''">
+                AND field_remark LIKE CONCAT('%', #{fieldRemark}, '%')
             </if>
         ORDER BY id DESC
     </select>

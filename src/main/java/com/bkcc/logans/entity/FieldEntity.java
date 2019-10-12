@@ -35,13 +35,13 @@ public class FieldEntity extends BaseEntity{
      *
      *  @since  2019-09-20 15:27:37
      */
-    private String fileKey;
+    private String fieldKey;
     /**
      * 【描 述】：字段中文描述
      *
      *  @since  2019-09-20 15:27:37
      */
-    private String fileRemark;
+    private String fieldRemark;
 
     /**
      * 【描 述】：字段对应枚举集合

@@ -106,7 +106,7 @@ public class LogansTaskActuator extends AbstractTaskActuator {
             StringBuffer fieldSb = new StringBuffer();
             JSONObject json = new JSONObject();
             for (FieldEntity fieldEntity : fieldList) {
-                String key = fieldEntity.getFileKey();
+                String key = fieldEntity.getFieldKey();
                 if (!jsonObject.containsKey(key)) {
                     continue;
                 }
