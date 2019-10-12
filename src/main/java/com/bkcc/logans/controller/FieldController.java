@@ -1,5 +1,16 @@
 package com.bkcc.logans.controller;
 
+import com.bkcc.core.data.ViewData;
+import com.bkcc.logans.controller.base.BaseController;
+import com.bkcc.logans.entity.FieldEntity;
+import com.bkcc.logans.service.FieldService;
+import com.github.pagehelper.PageInfo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,18 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.bkcc.core.data.ViewData;
-import com.bkcc.logans.controller.base.BaseController;
-import com.github.pagehelper.PageInfo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-
-import com.bkcc.logans.entity.FieldEntity;
-import com.bkcc.logans.service.FieldService;
 
 /**
  * 【描 述】：日志分析模块字段表Controller
@@ -149,6 +148,26 @@ public class FieldController extends BaseController{
         FieldEntity fieldEntity = fieldService.selectFieldById(fieldId);
         return ViewData.ok(fieldEntity);
     }
-    
+
+
+
+
+    /**
+     * 【描 述】：查询信息列表
+     *
+     * @since 2019-07-29 15:31:06
+     */
+    @PostMapping("/list4view")
+    public ViewData selectFeedbackList(Integer page, Integer rows, Long taskId) {
+        FieldEntity fieldEntity = new FieldEntity();
+        fieldEntity.setPageNum(page);
+        fieldEntity.setPageSize(rows);
+        fieldEntity.setTaskId(taskId);
+        PageInfo<FieldEntity> pageInfo = fieldService.selectFieldList(fieldEntity);
+        ViewData returnV = new ViewData();
+        returnV.setrows(pageInfo.getList());
+        returnV.settotal(pageInfo.getTotal());
+        return returnV;
+    }
     
 }///：～

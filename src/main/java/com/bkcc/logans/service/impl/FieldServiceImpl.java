@@ -65,6 +65,7 @@ public class FieldServiceImpl implements FieldService{
      */
     @Override
     public void deleteFieldById(Long id) {
+        fieldEnumMapper.deleteFieldEnumByFieldId(id);
         fieldMapper.deleteFieldById(id);
     }
 

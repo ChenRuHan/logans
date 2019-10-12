@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <th:block th:include="onload_js :: head"></th:block>
+
+    <script type="text/javascript" th:src="@{'../../task/task.js'}"></script>
+    <script type="text/javascript" th:src="@{'../../task/field.js'}"></script>
+    <script type="text/javascript" th:src="@{'../../task/fieldEnum.js'}"></script>
+    <script type="text/javascript" th:src="@{'../../task/taskRes.js'}"></script>
+</head>
+<script>
+    /*<![CDATA[*/
+
+    var fieldEnumViewArea = {
+        xtype: 'viewArea',
+        id: 'tabsPage',
+        region: {
+            center: fieldEnumGridArea,
+            south: fieldEnumFormArea
+        }
+    };
+
+    var fieldViewArea = {
+        xtype: 'viewArea',
+        id: 'tabsPage',
+        region: {
+            center: fieldGridArea,
+            south: fieldFormArea
+        }
+    };
+
+    var taskFormViewArea = {
+        xtype: 'viewArea',
+        id: 'tabsPage',
+        region: {
+            center: taskFormArea
+        }
+    };
+
+    var taskViewArea = {
+        xtype: 'viewArea',
+        region: {
+            center: taskGridArea,
+            south: resGridArea
+        }
+    };
+
+
+    $(function () {
+        $.appInit({
+            xtype: "viewport",
+            items: [taskViewArea, taskFormViewArea, fieldViewArea, fieldEnumViewArea]
+        });
+    })
+    /*]]>*/
+</script>
+<body>
+</body>
+</html>

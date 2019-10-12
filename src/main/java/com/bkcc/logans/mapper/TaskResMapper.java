@@ -1,7 +1,9 @@
 package com.bkcc.logans.mapper;
 
-import java.util.List;
 import com.bkcc.logans.entity.TaskResEntity;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 【描 述】：日志分析任务结果表Mapper接口
@@ -20,6 +22,16 @@ public interface TaskResMapper {
      * @since 2019-09-23 17:24:57
      */
     void deleteTaskResById(Long id);
+
+    /**
+     * 【描 述】：通过任务ID删除
+     *
+     * @param taskId
+     * @return void
+     * @author 陈汝晗
+     * @since 2019/10/12 17:16
+     */
+    void deleteTaskResByTaskId(@Param("taskId") Long taskId);
 
     /**
      * 【描 述】：添加日志分析任务结果表数据

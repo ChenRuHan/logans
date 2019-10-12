@@ -13,7 +13,11 @@
         DELETE FROM logans_field 
         WHERE id = #{id}
     </delete>
-    
+    <delete id="deleteFieldByTaskId">
+        DELETE FROM logans_field
+        WHERE task_id = #{taskId}
+    </delete>
+
     <update id="updateFieldById">
         UPDATE logans_field 
         SET id = #{id}

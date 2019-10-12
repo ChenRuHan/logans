@@ -1,7 +1,9 @@
 package com.bkcc.logans.mapper;
 
-import java.util.List;
 import com.bkcc.logans.entity.FieldEntity;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 【描 述】：日志分析模块字段表Mapper接口
@@ -20,6 +22,15 @@ public interface FieldMapper {
      * @since 2019-09-20 15:27:37
      */
     void deleteFieldById(Long id);
+    /**
+     * 【描 述】：通过任务ID删除
+     *
+     * @param taskId
+     * @return void
+     * @author 陈汝晗
+     * @since 2019/10/12 17:15
+     */
+    void deleteFieldByTaskId(@Param("taskId") Long taskId);
 
     /**
      * 【描 述】：添加日志分析模块字段表数据

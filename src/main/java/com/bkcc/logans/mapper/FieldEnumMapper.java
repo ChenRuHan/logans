@@ -1,7 +1,9 @@
 package com.bkcc.logans.mapper;
 
-import java.util.List;
 import com.bkcc.logans.entity.FieldEnumEntity;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 【描 述】：日志分析模块字段枚举表Mapper接口
@@ -20,6 +22,24 @@ public interface FieldEnumMapper {
      * @since 2019-09-20 15:28:26
      */
     void deleteFieldEnumById(Long id);
+    /**
+     * 【描 述】：通过任务Id删除
+     *
+     * @param taskId
+     * @return void
+     * @author 陈汝晗
+     * @since 2019/10/12 17:15
+     */
+    void deleteFieldEnumByTaskId(@Param("taskId") Long taskId);
+    /**
+     * 【描 述】：通过字段Id删除
+     *
+     * @param fieldId
+     * @return void
+     * @author 陈汝晗
+     * @since 2019/10/12 17:15
+     */
+    void deleteFieldEnumByFieldId(@Param("fieldId") Long fieldId);
 
     /**
      * 【描 述】：添加日志分析模块字段枚举表数据

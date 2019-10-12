@@ -13,7 +13,12 @@
         DELETE FROM logans_task_res 
         WHERE id = #{id}
     </delete>
-    
+
+    <delete id="deleteTaskResByTaskId">
+        DELETE FROM logans_task_res
+        WHERE task_id = #{taskId}
+    </delete>
+
     <update id="updateTaskResById">
         UPDATE logans_task_res 
         SET id = #{id}

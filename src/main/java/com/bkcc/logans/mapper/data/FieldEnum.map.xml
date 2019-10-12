@@ -13,7 +13,15 @@
         DELETE FROM logans_field2_enum 
         WHERE id = #{id}
     </delete>
-    
+    <delete id="deleteFieldEnumByTaskId">
+        DELETE FROM logans_field2_enum
+        WHERE task_id = #{taskId}
+    </delete>
+    <delete id="deleteFieldEnumByFieldId">
+        DELETE FROM logans_field2_enum
+        WHERE field_id = #{fieldId}
+    </delete>
+
     <update id="updateFieldEnumById">
         UPDATE logans_field2_enum 
         SET id = #{id}

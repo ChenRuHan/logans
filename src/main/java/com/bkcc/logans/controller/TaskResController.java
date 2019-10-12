@@ -1,5 +1,16 @@
 package com.bkcc.logans.controller;
 
+import com.bkcc.core.data.ViewData;
+import com.bkcc.logans.controller.base.BaseController;
+import com.bkcc.logans.entity.TaskResEntity;
+import com.bkcc.logans.service.TaskResService;
+import com.github.pagehelper.PageInfo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,18 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.bkcc.core.data.ViewData;
-import com.bkcc.logans.controller.base.BaseController;
-import com.github.pagehelper.PageInfo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-
-import com.bkcc.logans.entity.TaskResEntity;
-import com.bkcc.logans.service.TaskResService;
 
 /**
  * 【描 述】：日志分析任务结果表Controller
@@ -31,7 +30,7 @@ import com.bkcc.logans.service.TaskResService;
  */
 @RestController
 @Api(value = "日志分析任务结果表Controller")
-@RequestMapping("/api/taskRes")
+@RequestMapping("/api/task-res")
 public class TaskResController extends BaseController{
 
     /**
@@ -157,6 +156,25 @@ public class TaskResController extends BaseController{
         TaskResEntity taskResEntity = taskResService.selectTaskResById(taskResId);
         return ViewData.ok(taskResEntity);
     }
-    
-    
+
+
+    /**
+     * 【描 述】：查询信息列表
+     *
+     * @since 2019-07-29 15:31:06
+     */
+    @PostMapping("/list4view")
+    public ViewData selectFeedbackList(Integer page, Integer rows, Long taskId) {
+        TaskResEntity taskRes = new TaskResEntity();
+        taskRes.setPageNum(page);
+        taskRes.setPageSize(rows);
+        taskRes.setTaskId(taskId);
+        PageInfo<TaskResEntity> pageInfo = taskResService.selectTaskResList(taskRes);
+        ViewData returnV = new ViewData();
+        returnV.setrows(pageInfo.getList());
+        returnV.settotal(pageInfo.getTotal());
+        return returnV;
+    }
+
+
 }///：～

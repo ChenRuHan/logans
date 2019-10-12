@@ -1,14 +1,17 @@
 package com.bkcc.logans.service.impl;
 
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.bkcc.logans.entity.TaskEntity;
+import com.bkcc.logans.mapper.FieldEnumMapper;
+import com.bkcc.logans.mapper.FieldMapper;
+import com.bkcc.logans.mapper.TaskMapper;
+import com.bkcc.logans.mapper.TaskResMapper;
+import com.bkcc.logans.service.TaskService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import com.bkcc.logans.entity.TaskEntity;
-import com.bkcc.logans.mapper.TaskMapper;
-import com.bkcc.logans.service.TaskService;
+import java.util.List;
 
 /**
  * 【描 述】：日志分析任务配置表业务实现类
@@ -28,7 +31,28 @@ public class TaskServiceImpl implements TaskService{
      */
     @Autowired
     private TaskMapper taskMapper;
-    
+    /**
+     * 【描 述】：日志分析任务结果表Mapper接口
+     *
+     *  @since 2019/10/12 17:14
+     */
+    @Autowired
+    private TaskResMapper taskResMapper;
+    /**
+     * 【描 述】：日志分析模块字段表Mapper接口
+     *
+     *  @since 2019/10/12 17:14
+     */
+    @Autowired
+    private FieldMapper fieldMapper;
+    /**
+     * 【描 述】：日志分析模块字段枚举表Mapper接口
+     *
+     *  @since 2019/10/12 17:14
+     */
+    @Autowired
+    private FieldEnumMapper fieldEnumMapper;
+
     /**
      * 【描 述】：添加或修改数据
      *
@@ -52,6 +76,9 @@ public class TaskServiceImpl implements TaskService{
      */
     @Override
     public void deleteTaskById(Long id) {
+        fieldEnumMapper.deleteFieldEnumByTaskId(id);
+        fieldMapper.deleteFieldByTaskId(id);
+        taskResMapper.deleteTaskResByTaskId(id);
         taskMapper.deleteTaskById(id);
     }
 

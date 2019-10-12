@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * 【描 述】：日志分析任务配置表Controller
@@ -45,8 +46,6 @@ public class TaskController extends BaseController{
     @Autowired
     private TaskService taskService;
 
-
-    
     /**
      * 【描 述】：查询日志分析任务配置表信息列表
      *
@@ -92,7 +91,6 @@ public class TaskController extends BaseController{
         return returnV;
     }
             
-
     /**
      * 【描 述】：添加、修改日志分析任务配置表信息
      *
@@ -172,6 +170,38 @@ public class TaskController extends BaseController{
     }
 
 
+    /**
+     * 【描 述】：展示页面
+     *
+     * @return
+     * @since Mar 20, 2019
+     */
+    @GetMapping("/view")
+    public ModelAndView returnView() {
+        ModelAndView m = new ModelAndView();
+        m.setViewName("task/Task");
+        return m;
+    }
+
+
+    /**
+     * 【描 述】：查询信息列表
+     *
+     * @since 2019-07-29 15:31:06
+     */
+    @PostMapping("/list4view")
+    public ViewData selectFeedbackList(Integer page, Integer rows) {
+        TaskEntity systemNoticeEntity = new TaskEntity();
+        systemNoticeEntity.setPageNum(page);
+        systemNoticeEntity.setPageSize(rows);
+        PageInfo<TaskEntity> pageInfo = taskService.selectTaskList(systemNoticeEntity);
+        ViewData returnV = new ViewData();
+        returnV.setrows(pageInfo.getList());
+        returnV.settotal(pageInfo.getTotal());
+        return returnV;
+    }
+
+
 
     @Autowired
     @Qualifier("pollTaskDispatch")
@@ -190,5 +220,7 @@ public class TaskController extends BaseController{
         new Thread(taskHandler).start();
         return ViewData.ok();
     }
-    
+
+
+
 }///：～
