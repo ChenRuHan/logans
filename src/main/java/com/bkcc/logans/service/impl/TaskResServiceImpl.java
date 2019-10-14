@@ -1,14 +1,17 @@
 package com.bkcc.logans.service.impl;
 
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.bkcc.logans.entity.TaskResEntity;
+import com.bkcc.logans.entity.hbase.AnsResHbaseEntity;
+import com.bkcc.logans.mapper.TaskResMapper;
+import com.bkcc.logans.repository.hbase.AnsResRepository;
+import com.bkcc.logans.service.TaskResService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import com.bkcc.logans.entity.TaskResEntity;
-import com.bkcc.logans.mapper.TaskResMapper;
-import com.bkcc.logans.service.TaskResService;
+import java.util.List;
 
 /**
  * 【描 述】：日志分析任务结果表业务实现类
@@ -28,7 +31,15 @@ public class TaskResServiceImpl implements TaskResService{
      */
     @Autowired
     private TaskResMapper taskResMapper;
-    
+
+    /**
+     * 【描 述】：HBASE日志分析结果接口
+     *
+     *  @since 2019/10/14 11:06
+     */
+    @Autowired
+    private AnsResRepository ansResRepository;
+
     /**
      * 【描 述】：添加或修改数据
      *
@@ -83,5 +94,17 @@ public class TaskResServiceImpl implements TaskResService{
     public TaskResEntity selectTaskResById(Long id) {
         return taskResMapper.selectTaskResById(id);
     }
-    
+
+    /**
+     * 【描 述】：通过订单号查询日志分析结果
+     *
+     * @param orderNO 订单编号
+     * @return com.bkcc.logans.entity.hbase.AnsResHbaseEntity
+     * @author 陈汝晗
+     * @since 2019/10/14 11:05
+     */
+    @Override
+    public AnsResHbaseEntity selectTaskResByOrderNO(Long orderNO) {
+        return ansResRepository.get(StringUtils.reverse(orderNO+""));
+    }
 }///:~

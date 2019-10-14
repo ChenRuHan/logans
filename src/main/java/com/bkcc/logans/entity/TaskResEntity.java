@@ -52,4 +52,11 @@ public class TaskResEntity extends BaseEntity{
      *  @since  2019-09-23 17:24:57
      */
     private Integer errorCode;
+
+    /**
+     * 【描 述】：分析结果JSON字符串
+     *
+     *  @since 2019/10/14 11:11
+     */
+    private String resJSON;
 }///:~
