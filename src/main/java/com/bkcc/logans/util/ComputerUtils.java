@@ -43,7 +43,6 @@ public class ComputerUtils {
             }
         } catch (Exception e) {
         }
-        log.debug("# 本机IP地址:{}", ipList);
         return ipList;
     }
 

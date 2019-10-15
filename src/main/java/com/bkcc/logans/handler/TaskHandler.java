@@ -28,10 +28,10 @@ public class TaskHandler implements Runnable{
     @Override
     public void run() {
         TaskEntity task = actuator.getTaskEntity();
-        if (!taskDispatch.canExecute(task.getId())) {
-            log.info("# 本次任务不执行. taskId:{}", task.getId());
-            return;
-        }
+//        if (!taskDispatch.canExecute(task.getId())) {
+//            log.info("# 本次任务不执行. taskId:{}", task.getId());
+//            return;
+//        }
         Object res = null;
         Exception e1 = null;
         Long tl = System.currentTimeMillis();
