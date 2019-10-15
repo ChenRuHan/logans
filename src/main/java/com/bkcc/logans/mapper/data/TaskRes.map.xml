@@ -56,11 +56,13 @@
             <if test="taskId != null"> 
                 AND task_id = #{taskId}
             </if>
-            <if test="beginTime != null"> 
-                AND begin_time = #{beginTime}
+            <if test="beginTime != null">
+                AND begin_time >= #{beginTime}
             </if>
-            <if test="endTime != null"> 
-                AND end_time = #{endTime}
+            <if test="endTime != null">
+              <![CDATA[
+                AND begin_time <= #{endTime}
+              ]]>
             </if>
             <if test="errorCode != null"> 
                 AND error_code = #{errorCode}

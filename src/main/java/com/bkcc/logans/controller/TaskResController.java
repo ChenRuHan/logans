@@ -57,8 +57,8 @@ public class TaskResController extends BaseController {
                     + "</br> pageSize : 每页大小--不传查询全部"
                     + "</br> orderNO : 任务执行单号,"
                     + "</br> taskId : 日志分析任务ID,"
-                    + "</br> beginTime : 任务执行开始时间,"
-                    + "</br> endTime : 任务执行结束时间,"
+                    + "</br> beginTime : 任务执行开始时间--begin,"
+                    + "</br> endTime : 任务执行开始时间--end,"
                     + "</br> errorCode : 错误码,"
                     + "</br>}", dataType = "TaskResEntity", required = true)
     })
@@ -70,6 +70,7 @@ public class TaskResController extends BaseController {
                     + "</br> beginTime : 任务执行开始时间,"
                     + "</br> endTime : 任务执行结束时间,"
                     + "</br> errorCode : 错误码,"
+                    + "</br> resJSON : 返回结果JSON字符串"
                     + "</br>}...], "
                     + "</br> newPrimaryKeys : {},"
                     + "</br> total:总数 </br>}")
@@ -80,6 +81,13 @@ public class TaskResController extends BaseController {
             return ViewData.error("传入信息有误");
         }
         PageInfo<TaskResEntity> pageInfo = taskResService.selectTaskResList(taskRes);
+        for (TaskResEntity taskResEntity : pageInfo.getList()) {
+            AnsResHbaseEntity ansResHbaseEntity = taskResService.selectTaskResByOrderNO(taskResEntity.getOrderNO());
+            if (ansResHbaseEntity == null) {
+                continue;
+            }
+            taskResEntity.setResJSON(ansResHbaseEntity.getRes());
+        }
         ViewData returnV = new ViewData();
         returnV.setrows(pageInfo.getList());
         returnV.settotal(pageInfo.getTotal());
