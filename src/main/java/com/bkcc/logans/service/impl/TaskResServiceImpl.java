@@ -81,8 +81,12 @@ public class TaskResServiceImpl implements TaskResService{
             PageHelper.startPage(taskRes.getPageNum(), taskRes.getPageSize());
         }
         List<TaskResEntity> returnList = taskResMapper.selectTaskResList(taskRes);
+        for (TaskResEntity taskResEntity : returnList) {
+            setResJSON(taskResEntity);
+        }
         return new PageInfo<>(returnList);
     }
+
 
     /**
      * 【描 述】：查询单个日志分析任务结果表信息
@@ -92,7 +96,9 @@ public class TaskResServiceImpl implements TaskResService{
      */
     @Override
     public TaskResEntity selectTaskResById(Long id) {
-        return taskResMapper.selectTaskResById(id);
+        TaskResEntity taskResEntity = taskResMapper.selectTaskResById(id);
+        setResJSON(taskResEntity);
+        return taskResEntity;
     }
 
     /**
@@ -105,6 +111,21 @@ public class TaskResServiceImpl implements TaskResService{
      */
     @Override
     public AnsResHbaseEntity selectTaskResByOrderNO(Long orderNO) {
-        return ansResRepository.get(StringUtils.reverse(orderNO+""));
+        AnsResHbaseEntity ans =  ansResRepository.get(StringUtils.reverse(orderNO+""));
+        if (ans == null) {
+            ans = new AnsResHbaseEntity();
+        }
+        return ans;
+    }
+
+    private void setResJSON(TaskResEntity taskResEntity) {
+        if (taskResEntity == null) {
+            return;
+        }
+        AnsResHbaseEntity df = selectTaskResByOrderNO(taskResEntity.getOrderNO());
+        if (df == null) {
+            return;
+        }
+        taskResEntity.setResJSON(df.getRes());
     }
 }///:~
