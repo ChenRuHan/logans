@@ -1,7 +1,6 @@
 package com.bkcc.logans.service;
 
 import com.bkcc.logans.entity.TaskResEntity;
-import com.bkcc.logans.entity.hbase.AnsResHbaseEntity;
 import com.github.pagehelper.PageInfo;
 
 /**
@@ -48,13 +47,4 @@ public interface TaskResService {
      */
     TaskResEntity selectTaskResById(Long id);
 
-    /**
-     * 【描 述】：通过订单号查询日志分析结果
-     *
-     * @param orderNO 订单编号
-     * @return com.bkcc.logans.entity.hbase.AnsResHbaseEntity
-     * @author 陈汝晗
-     * @since 2019/10/14 11:05
-     */
-    AnsResHbaseEntity selectTaskResByOrderNO(Long orderNO);
 }///:~

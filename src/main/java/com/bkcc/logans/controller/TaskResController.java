@@ -1,10 +1,8 @@
 package com.bkcc.logans.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.bkcc.core.data.ViewData;
 import com.bkcc.logans.controller.base.BaseController;
 import com.bkcc.logans.entity.TaskResEntity;
-import com.bkcc.logans.entity.hbase.AnsResHbaseEntity;
 import com.bkcc.logans.service.TaskResService;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
@@ -85,37 +83,8 @@ public class TaskResController extends BaseController {
     }
 
     /**
-     * 【描 述】：查询单个日志分析任务结果表信息
-     *
-     * @param taskResId
-     * @return
-     * @since Jul 15, 2019
-     */
-    @ApiOperation(value = "查询单个日志分析任务结果表信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "path", name = "taskResId", value = "日志分析任务结果表ID", dataType = "Long", required = true)
-    })
-    @ApiResponses({
-        @ApiResponse(code = 200, message = "{</br> rows:[{"
-            + "</br> orderNO : 任务执行单号,"
-            + "</br> taskId : 日志分析任务ID,"
-            + "</br> beginTime : 任务执行开始时间,"
-            + "</br> endTime : 任务执行结束时间,"
-            + "</br> errorCode : 错误码,"
-            + "</br> resJSON : 返回结果JSON字符串"
-            + "</br>}], </br> newPrimaryKeys : {}"
-            + "</br>}")
-    })
-    @GetMapping("/{taskResId}/detail")
-    public ViewData selectTaskResById(@PathVariable Long taskResId) {
-        TaskResEntity taskResEntity = taskResService.selectTaskResById(taskResId);
-        return ViewData.ok(taskResEntity);
-    }
-
-    /**
      * 【描 述】：通过订单号查询日志分析结果
      *
-     * @param taskResId
      * @return
      * @since Jul 15, 2019
      */
@@ -125,14 +94,20 @@ public class TaskResController extends BaseController {
     })
     @ApiResponses({
             @ApiResponse(code = 200, message = "{</br> rows:[{"
-                    + "</br> 分析字段结果JSON格式"
+                    + "</br> orderNO : 任务执行单号,"
+                    + "</br> taskId : 日志分析任务ID,"
+                    + "</br> beginTime : 任务执行开始时间,"
+                    + "</br> endTime : 任务执行结束时间,"
+                    + "</br> errorCode : 错误码,"
+                    + "</br> resJSON : 返回结果JSON字符串"
                     + "</br>}], </br> newPrimaryKeys : {}"
                     + "</br>}")
     })
     @GetMapping("/{orderNO}/detail")
     public ViewData selectTaskResByOrderNO(@PathVariable Long orderNO) {
-        AnsResHbaseEntity taskResEntity = taskResService.selectTaskResByOrderNO(orderNO);
-        return ViewData.ok(JSONObject.parseObject(taskResEntity.getRes()));
+        TaskResEntity par = new TaskResEntity();
+        par.setOrderNO(orderNO);
+        return selectTaskResList(par);
     }
 
     /**

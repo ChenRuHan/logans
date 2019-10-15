@@ -101,31 +101,16 @@ public class TaskResServiceImpl implements TaskResService{
         return taskResEntity;
     }
 
-    /**
-     * 【描 述】：通过订单号查询日志分析结果
-     *
-     * @param orderNO 订单编号
-     * @return com.bkcc.logans.entity.hbase.AnsResHbaseEntity
-     * @author 陈汝晗
-     * @since 2019/10/14 11:05
-     */
-    @Override
-    public AnsResHbaseEntity selectTaskResByOrderNO(Long orderNO) {
-        AnsResHbaseEntity ans =  ansResRepository.get(StringUtils.reverse(orderNO+""));
-        if (ans == null) {
-            ans = new AnsResHbaseEntity();
-        }
-        return ans;
-    }
 
     private void setResJSON(TaskResEntity taskResEntity) {
         if (taskResEntity == null) {
             return;
         }
-        AnsResHbaseEntity df = selectTaskResByOrderNO(taskResEntity.getOrderNO());
-        if (df == null) {
-            return;
+        String orderNO = taskResEntity.getOrderNO()+"";
+        AnsResHbaseEntity ans = ansResRepository.get(StringUtils.reverse(orderNO));
+        if (ans == null) {
+            ans = new AnsResHbaseEntity();
         }
-        taskResEntity.setResJSON(df.getRes());
+        taskResEntity.setResJSON(ans.getRes());
     }
 }///:~
