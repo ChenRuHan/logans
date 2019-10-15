@@ -1,5 +1,7 @@
 package com.bkcc.logans.util;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -14,6 +16,7 @@ import java.util.Set;
  * @version v1.0
  * @since 2019-09-21 13:28
  */
+@Slf4j
 public class ComputerUtils {
 
     /**
@@ -40,6 +43,7 @@ public class ComputerUtils {
             }
         } catch (Exception e) {
         }
+        log.debug("# 本机IP地址:{}", ipList);
         return ipList;
     }
 
