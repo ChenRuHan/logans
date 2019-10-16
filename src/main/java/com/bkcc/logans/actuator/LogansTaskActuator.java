@@ -94,7 +94,7 @@ public class LogansTaskActuator extends AbstractTaskActuator {
             log.debug("# 没有需要分析的列,直接返回, taskId:{}", taskEntity.getId());
             return null;
         }
-        String reverseOrderNO = StringUtils.reverse(getOrderNO()+"");
+        String reverseOrderNO = StringUtils.reverse(getOrderNO() + "");
         String url = ElasticSearchUtils.getSimpleLogEsUrl(taskEntity.getModuleName(), ip, port);
         Map<String, Object> paramMap = ElasticSearchUtils.createParam(taskEntity);
         List<JSONObject> list = ElasticSearchUtils.querySimpleLogList(url, paramMap);
@@ -273,7 +273,7 @@ public class LogansTaskActuator extends AbstractTaskActuator {
         taskResService.insertOrUpdate(taskRes);
 
         AnsResHbaseEntity ansResHbaseEntity = new AnsResHbaseEntity();
-        ansResHbaseEntity.setRowKey(StringUtils.reverse(getOrderNO()+""));
+        ansResHbaseEntity.setRowKey(StringUtils.reverse(getOrderNO() + ""));
         ansResHbaseEntity.setRes(JSONObject.toJSONString(res));
         ansResRepository.save(ansResHbaseEntity);
     }

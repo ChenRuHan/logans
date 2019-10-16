@@ -72,7 +72,7 @@ public class InitTask {
         List<String> ipList = new ArrayList<>();
         for (InstanceInfo instance : application.getInstances()) {
             if (instance.getStatus().equals(InstanceInfo.InstanceStatus.UP)) {
-                ipList.add(instance.getIPAddr());
+                ipList.add(instance.getIPAddr() + ":" + instance.getPort());
             }
         }
         if (ipList.isEmpty()) {

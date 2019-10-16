@@ -2,13 +2,14 @@ package com.bkcc.logans.dispatch;
 
 import com.bkcc.logans.constant.RedisKeyConstant;
 import com.bkcc.logans.dispatch.abs.AbstractTaskDispatch;
-import com.bkcc.logans.util.ComputerUtils;
 import com.bkcc.util.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -25,6 +26,12 @@ public class PollTaskDispatch extends AbstractTaskDispatch {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Value("${spring.cloud.client.ipAddress}")
+    private String ip;
+
+    @Value("${server.port}")
+    private String port;
 
     /**
      * 【描 述】：轮询算法
@@ -56,7 +63,8 @@ public class PollTaskDispatch extends AbstractTaskDispatch {
                 }
             }
         }
-        Set<String> ipSet = ComputerUtils.getIPSet();
+        Set<String> ipSet = new HashSet<>();
+        ipSet.add(ip + ":" + port);
         if (ipSet.contains(nextIp)) {
             redisUtil.hmSet(RedisKeyConstant.TASK_KEY, taskId, nextIp);
             return true;
