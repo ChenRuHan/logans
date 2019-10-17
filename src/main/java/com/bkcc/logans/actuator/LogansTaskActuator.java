@@ -11,6 +11,7 @@ import com.bkcc.logans.entity.hbase.AnsResHbaseEntity;
 import com.bkcc.logans.entity.hbase.QueryResHbaseEntity;
 import com.bkcc.logans.enums.AnsTypeEnum;
 import com.bkcc.logans.enums.CalendarEnum;
+import com.bkcc.logans.enums.LogSourceEnum;
 import com.bkcc.logans.repository.hbase.AnsResRepository;
 import com.bkcc.logans.repository.hbase.QueryResRepository;
 import com.bkcc.logans.service.FieldService;
@@ -91,7 +92,16 @@ public class LogansTaskActuator extends AbstractTaskActuator {
      */
     @Autowired
     @Qualifier("getHbaseAnsLogService")
-    private GetAnsLogService getAnsLogService;
+    private GetAnsLogService getHbaseAnsLogService;
+
+    /**
+     * 【描 述】：获取分析日志接口
+     *
+     *  @since 2019/10/17 15:04
+     */
+    @Autowired
+    @Qualifier("getESAnsLogService")
+    private GetAnsLogService getESAnsLogService;
 
     /**
      * 【描 述】：任务执行方法
@@ -108,7 +118,12 @@ public class LogansTaskActuator extends AbstractTaskActuator {
             log.debug("# 没有需要分析的列,直接返回, taskId:{}", taskEntity.getId());
             return null;
         }
-        List<JSONObject> ansLogList = getAnsLogService.getAnsLogList(taskEntity);
+        List<JSONObject> ansLogList = null;
+        if (LogSourceEnum.ES.equels(taskEntity.getLogSource())) {
+            ansLogList = getESAnsLogService.getAnsLogList(taskEntity);
+        } else if (LogSourceEnum.HBASE.equels(taskEntity.getLogSource())) {
+            ansLogList = getHbaseAnsLogService.getAnsLogList(taskEntity);
+        }
         if (ansLogList == null || ansLogList.isEmpty()) {
             return new ArrayList<>();
         }

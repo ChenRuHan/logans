@@ -36,6 +36,12 @@ public class TaskEntity extends BaseEntity{
      */
     private String moduleName;
     /**
+     * 【描 述】：分析数据日志来源：1--es，2--hbase
+     *
+     *  @since  2019-09-23 11:00:57
+     */
+    private Integer logSource;
+    /**
      * 【描 述】：需要分析请求的方法 GET POST DELETE PUT
      *
      *  @since  2019-09-23 11:00:57

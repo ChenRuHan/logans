@@ -22,6 +22,17 @@ var taskGridArea = {
             }
         },
         {
+            field: 'logSource', title: '分析数据日志来源', width: 50, formatter: function (value) {
+                switch (value) {
+                    case 1:
+                        return "通过ES获取";
+                    case 2:
+                        return "通过请求传入参数获取";
+                }
+                return '';
+            }
+        },
+        {
             field: 'ansRateType', title: '分析频次', width: 30, formatter: function (value) {
                 switch (value) {
                     case 1:
@@ -99,6 +110,15 @@ var taskGridArea = {
 
 }
 
+
+var logSourceDataList = [{
+    'id': '1',
+    'name': '通过ES获取'
+}, {
+    'id': '2',
+    'name': '通过请求传入参数获取',
+    'selected': true
+}];
 
 var ansTypeDataList = [{
     'id': '1',
@@ -185,6 +205,14 @@ var taskFormArea = {
         textField: "name",
         data: ansRateTypeDataList
     }, {
+        label: "分析数据日志来源",
+        xtype: "combobox",
+        name: "logSource",
+        id: "logSourceId",
+        valueField: "id",
+        textField: "name",
+        data: logSourceDataList
+    }, {
         label: "分析结果输出消息队列名称",
         xtype: "textbox",
         name: "outQueue",
@@ -205,6 +233,7 @@ var taskFormArea = {
                             reqMethod: $("#reqMethodId").combobox('getValue'),
                             ansType: $("#ansTypeId").combobox('getValue'),
                             ansRateType: $("#ansRateTypeId").combobox('getValue'),
+                            logSource: $("#logSourceId").combobox('getValue'),
 
                             taskName: $("#taskNameId").textbox('getValue'),
                             moduleName: $("#moduleNameId").textbox('getValue'),

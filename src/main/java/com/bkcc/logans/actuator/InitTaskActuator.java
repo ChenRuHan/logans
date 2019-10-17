@@ -20,9 +20,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 【描 述】：初始化任务执行器
@@ -56,7 +58,6 @@ public class InitTaskActuator extends AbstractTaskActuator {
     private AbstractTaskDispatch taskDispatch;
 
 
-
     @Autowired
     private ApplicationContext applicationContext;
 
@@ -73,6 +74,7 @@ public class InitTaskActuator extends AbstractTaskActuator {
         if (taskRegistrar == null) {
             return null;
         }
+        redisUtil.remove(RedisKeyConstant.COMPARE_TASK_KEY);
         /*
             添加新任务
          */
@@ -97,12 +99,20 @@ public class InitTaskActuator extends AbstractTaskActuator {
         /*
             去掉多余任务
          */
-        for (Long taskId : SCHEDULED_TASK_MAP.keySet()) {
+        Iterator<Map.Entry<Long, ScheduledTask>> it = SCHEDULED_TASK_MAP.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<Long, ScheduledTask> m = it.next();
+            Long taskId = m.getKey();
+            ScheduledTask task = m.getValue();
             if (!taskIdSet.contains(taskId)) {
                 log.debug("# 移除已经删除的任务：taskId: {}", taskId);
                 redisUtil.hmDel(RedisKeyConstant.TASK_KEY, taskId);
-                SCHEDULED_TASK_MAP.get(taskId).cancel();
+                task.cancel();
+                it.remove();
             }
+        }
+        if (redisUtil.exists(RedisKeyConstant.COMPARE_TASK_KEY)) {
+            redisUtil.expire(RedisKeyConstant.COMPARE_TASK_KEY, 90, TimeUnit.SECONDS);
         }
         return null;
     }
@@ -115,7 +125,7 @@ public class InitTaskActuator extends AbstractTaskActuator {
      * @author 陈汝晗
      * @since 2019/10/16 16:14
      */
-    private List<TaskEntity> getTaskList(){
+    private List<TaskEntity> getTaskList() {
         return taskService.selectTaskList(null).getList();
     }
 

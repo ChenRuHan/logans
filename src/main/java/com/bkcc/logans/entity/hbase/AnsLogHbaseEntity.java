@@ -30,19 +30,33 @@ public class AnsLogHbaseEntity implements Serializable {
 
     /**
      * 【描 述】：日志数据JSON格式
-     *   "moduleName": moduleName,
-     *   "method": method,
-     *   "uri": uri,
-     *   "uid": uid,
-     *   "startTimeMillis": startTimeMillis,
-     *   "stopTimeMillis": stopTimeMillis,
-     *   "resultStatus": isSuccess,
-     *   "resultObj": result,
-     *   "taskIds": taskIds,
-     *   "args": {
-     *       'paramName1' : {obj1},
-     *       'paramName2' : {obj2},
-     *   }
+                {
+                    "stopTimeMillis":1571301735945,
+                    "resultStatus":"success",
+                    "args":{
+                        "residentEntity":{
+                            "communityId":659002002005,
+                            "labelParam":{},
+                            "pageNum":1,
+                            "pageSize":10,
+                            "residentName":""
+                        }
+                    },
+                    "uid":4160679347995648,
+                    "resultObj":{
+                        "code":1,
+                        "footer":[],
+                        "isSucceed":true,
+                        "message":"",
+                        "newPrimaryKeys":{},
+                        "total":30
+                    },
+                    "method":"POST",
+                    "startTimeMillis":1571301735268,
+                    "moduleName":"jczl",
+                    "taskIds":"13",
+                    "uri":"/api/resident/list"
+                }
      *
      *  @since  Aug 6, 2019 v1.0
      */

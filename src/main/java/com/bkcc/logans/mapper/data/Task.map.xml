@@ -4,9 +4,9 @@
 
     <insert id="insertTask" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO logans_task
-            (task_name, module_name, req_method, req_uri, ans_type, ans_rate_type, out_queue)
+            (task_name, module_name, req_method, req_uri, ans_type, ans_rate_type, out_queue, log_source)
         VALUES
-            (#{taskName}, #{moduleName}, #{reqMethod}, #{reqUri}, #{ansType}, #{ansRateType}, #{outQueue})
+            (#{taskName}, #{moduleName}, #{reqMethod}, #{reqUri}, #{ansType}, #{ansRateType}, #{outQueue}, #{logSource})
     </insert>
     
     <delete id="deleteTaskById">
@@ -32,7 +32,10 @@
             <if test="ansType != null"> 
                 , ans_type = #{ansType}
             </if>
-            <if test="ansRateType != null"> 
+            <if test="logSource != null">
+                , log_source = #{logSource}
+            </if>
+            <if test="ansRateType != null">
                 , ans_rate_type = #{ansRateType}
             </if>
             <if test="outQueue != null and outQueue != ''"> 
@@ -42,13 +45,13 @@
     </update>
             
     <select id="selectTaskById" resultType="com.bkcc.logans.entity.TaskEntity">
-        SELECT id, task_name taskName, module_name moduleName, req_method reqMethod, req_uri reqUri, ans_type ansType, ans_rate_type ansRateType, out_queue outQueue
+        SELECT id, task_name taskName, module_name moduleName, req_method reqMethod, req_uri reqUri, ans_type ansType, ans_rate_type ansRateType, out_queue outQueue, log_source logSource
         FROM logans_task
         WHERE id = #{id}
     </select>
     
     <select id="selectTaskList" resultType="com.bkcc.logans.entity.TaskEntity">
-        SELECT id, task_name taskName, module_name moduleName, req_method reqMethod, req_uri reqUri, ans_type ansType, ans_rate_type ansRateType, out_queue outQueue
+        SELECT id, task_name taskName, module_name moduleName, req_method reqMethod, req_uri reqUri, ans_type ansType, ans_rate_type ansRateType, out_queue outQueue, log_source logSource
         FROM logans_task  
         WHERE 1 = 1 
             <if test="taskName != null and taskName != ''"> 
