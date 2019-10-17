@@ -48,7 +48,7 @@ public class TaskEntity extends BaseEntity{
      */
     private String reqUri;
     /**
-     * 【描 述】：分析类型，1--不分析直接输出指定字段，2--通过指定字段聚合分析
+     * 【描 述】：分析类型，1--不分析直接输出指定字段，2--通过指定字段聚合分析，3--通过指定字段对比修改数据
      *
      *  @since  2019-09-23 11:00:57
      */

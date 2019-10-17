@@ -10,7 +10,15 @@ var taskGridArea = {
         {field: 'reqUri', title: '分析URI', width: 40},
         {
             field: 'ansType', title: '分析类型', width: 50, formatter: function (value) {
-                return value == 1 ? '不分析直接输出指定字段' : '通过指定字段聚合分析';
+                switch (value) {
+                    case 1:
+                        return "不分析直接输出指定字段";
+                    case 2:
+                        return "通过指定字段聚合分析";
+                    case 3:
+                        return "通过指定字段对比修改数据";
+                }
+                return '';
             }
         },
         {
@@ -99,6 +107,9 @@ var ansTypeDataList = [{
     'id': '2',
     'name': '通过指定字段聚合分析',
     'selected': true
+}, {
+    'id': '3',
+    'name': '通过指定字段对比修改数据'
 }];
 var ansRateTypeDataList = [{
     'id': '1',

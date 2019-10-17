@@ -13,5 +13,7 @@ public class RedisKeyConstant {
 
     public static final String IP_KEY = "logans:ip";
 
+    public static final String COMPARE_TASK_KEY = "logans:ans";
+
     private RedisKeyConstant() {}
 }///:~

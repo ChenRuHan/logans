@@ -9,6 +9,7 @@ import com.bkcc.logans.entity.TaskEntity;
 import com.bkcc.logans.entity.TaskResEntity;
 import com.bkcc.logans.entity.hbase.AnsResHbaseEntity;
 import com.bkcc.logans.entity.hbase.QueryResHbaseEntity;
+import com.bkcc.logans.enums.AnsTypeEnum;
 import com.bkcc.logans.enums.CalendarEnum;
 import com.bkcc.logans.repository.hbase.AnsResRepository;
 import com.bkcc.logans.repository.hbase.QueryResRepository;
@@ -136,7 +137,7 @@ public class LogansTaskActuator extends AbstractTaskActuator {
             taskResHbaseList.add(taskResHbaseEntity);
         }
         queryResRepository.save(taskResHbaseList);
-        if (taskEntity.getAnsType() == 1) {
+        if (AnsTypeEnum.NOT_ANS.equels(taskEntity.getAnsType())) {
             return returnJsonList;
         }
 

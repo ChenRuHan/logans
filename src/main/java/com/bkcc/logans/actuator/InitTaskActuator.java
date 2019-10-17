@@ -5,10 +5,12 @@ import com.bkcc.logans.config.LogansSchedulingConfigurer;
 import com.bkcc.logans.constant.RedisKeyConstant;
 import com.bkcc.logans.dispatch.abs.AbstractTaskDispatch;
 import com.bkcc.logans.entity.TaskEntity;
+import com.bkcc.logans.enums.AnsTypeEnum;
 import com.bkcc.logans.handler.TaskHandler;
 import com.bkcc.logans.service.TaskService;
 import com.bkcc.util.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -75,10 +77,17 @@ public class InitTaskActuator extends AbstractTaskActuator {
         /*
             添加新任务
          */
-        List<TaskEntity> taskList = taskService.selectTaskList(null).getList();
         Set<Long> taskIdSet = new HashSet<>();
-        for (TaskEntity taskEntity : taskList) {
+        for (TaskEntity taskEntity : getTaskList()) {
+            if (taskEntity == null) {
+                continue;
+            }
             Long taskId = taskEntity.getId();
+            insertToRedis(taskEntity);
+            if (AnsTypeEnum.COMPARE_ANS.equels(taskEntity.getAnsType())) {
+                continue;
+            }
+
             taskIdSet.add(taskId);
             if (SCHEDULED_TASK_MAP.containsKey(taskId)) {
                 continue;
@@ -101,6 +110,41 @@ public class InitTaskActuator extends AbstractTaskActuator {
             }
         }
         return null;
+    }
+
+    /**
+     * 【描 述】：获取需要定时分析的任务列表
+     *
+     * @param
+     * @return java.util.List<com.bkcc.logans.entity.TaskEntity>
+     * @author 陈汝晗
+     * @since 2019/10/16 16:14
+     */
+    private List<TaskEntity> getTaskList(){
+        return taskService.selectTaskList(null).getList();
+    }
+
+
+    /**
+     * 【描 述】：将需要分析的请求加入redis。
+     *
+     * @param taskEntity
+     * @return void
+     * @author 陈汝晗
+     * @since 2019/10/17 13:47
+     */
+    private void insertToRedis(TaskEntity taskEntity) {
+        // 不需要定时分析，直接对比
+        String key = taskEntity.getReqMethod() + taskEntity.getReqUri();
+        String taskIdRedis = (String) redisUtil.hmGet(RedisKeyConstant.COMPARE_TASK_KEY, key);
+        if (StringUtils.isBlank(taskIdRedis)) {
+            taskIdRedis = "";
+        }
+        taskIdRedis += "," + taskEntity.getId();
+        if (taskIdRedis.startsWith(",")) {
+            taskIdRedis = taskIdRedis.substring(1);
+        }
+        redisUtil.hmSet(RedisKeyConstant.COMPARE_TASK_KEY, key, taskIdRedis);
     }
 
 }///:~
