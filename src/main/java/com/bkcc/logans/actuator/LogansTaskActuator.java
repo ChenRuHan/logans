@@ -14,15 +14,15 @@ import com.bkcc.logans.enums.CalendarEnum;
 import com.bkcc.logans.repository.hbase.AnsResRepository;
 import com.bkcc.logans.repository.hbase.QueryResRepository;
 import com.bkcc.logans.service.FieldService;
+import com.bkcc.logans.service.GetAnsLogService;
 import com.bkcc.logans.service.TaskResService;
-import com.bkcc.logans.util.ElasticSearchUtils;
 import com.bkcc.logans.util.EncryptAndDecryptUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.stereotype.Component;
@@ -69,16 +69,29 @@ public class LogansTaskActuator extends AbstractTaskActuator {
      */
     @Autowired
     private FieldService fieldService;
+    /**
+     * 【描 述】：HBASE日志查询结果接口
+     *
+     * @since 2019/10/17 15:00
+     */
     @Autowired
     private QueryResRepository queryResRepository;
+    /**
+     * 【描 述】：HBASE日志分析结果接口
+     *
+     * @since 2019/10/17 15:00
+     */
     @Autowired
     private AnsResRepository ansResRepository;
 
-    @Value("${elastic-search.ip}")
-    private String ip;
-
-    @Value("${elastic-search.port}")
-    private int port;
+    /**
+     * 【描 述】：获取分析日志接口
+     *
+     *  @since 2019/10/17 15:04
+     */
+    @Autowired
+    @Qualifier("getHbaseAnsLogService")
+    private GetAnsLogService getAnsLogService;
 
     /**
      * 【描 述】：任务执行方法
@@ -95,15 +108,16 @@ public class LogansTaskActuator extends AbstractTaskActuator {
             log.debug("# 没有需要分析的列,直接返回, taskId:{}", taskEntity.getId());
             return null;
         }
+        List<JSONObject> ansLogList = getAnsLogService.getAnsLogList(taskEntity);
+        if (ansLogList == null || ansLogList.isEmpty()) {
+            return new ArrayList<>();
+        }
         String reverseOrderNO = StringUtils.reverse(getOrderNO() + "");
-        String url = ElasticSearchUtils.getSimpleLogEsUrl(taskEntity.getModuleName(), ip, port);
-        Map<String, Object> paramMap = ElasticSearchUtils.createParam(taskEntity);
-        List<JSONObject> list = ElasticSearchUtils.querySimpleLogList(url, paramMap);
         List<JSONObject> returnJsonList = new ArrayList<>();
         List<QueryResHbaseEntity> taskResHbaseList = new ArrayList<>();
         Map<String, JSONObject> value2JsonMap = new HashMap<>();
-        for (int i = 0; i < list.size(); i++) {
-            JSONObject jsonObject = list.get(i);
+        for (int i = 0; i < ansLogList.size(); i++) {
+            JSONObject jsonObject = ansLogList.get(i);
             StringBuffer fieldSb = new StringBuffer();
             JSONObject json = new JSONObject();
             for (FieldEntity fieldEntity : fieldList) {
@@ -151,6 +165,7 @@ public class LogansTaskActuator extends AbstractTaskActuator {
 
         return value2JsonMap.values();
     }
+
 
     /**
      * 【描 述】：将结果保存到数据库，并通过消息队列输出

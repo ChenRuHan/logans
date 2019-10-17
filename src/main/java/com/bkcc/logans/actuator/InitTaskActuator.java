@@ -5,7 +5,6 @@ import com.bkcc.logans.config.LogansSchedulingConfigurer;
 import com.bkcc.logans.constant.RedisKeyConstant;
 import com.bkcc.logans.dispatch.abs.AbstractTaskDispatch;
 import com.bkcc.logans.entity.TaskEntity;
-import com.bkcc.logans.enums.AnsTypeEnum;
 import com.bkcc.logans.handler.TaskHandler;
 import com.bkcc.logans.service.TaskService;
 import com.bkcc.util.redis.RedisUtil;
@@ -82,12 +81,8 @@ public class InitTaskActuator extends AbstractTaskActuator {
             if (taskEntity == null) {
                 continue;
             }
-            Long taskId = taskEntity.getId();
             insertToRedis(taskEntity);
-            if (AnsTypeEnum.COMPARE_ANS.equels(taskEntity.getAnsType())) {
-                continue;
-            }
-
+            Long taskId = taskEntity.getId();
             taskIdSet.add(taskId);
             if (SCHEDULED_TASK_MAP.containsKey(taskId)) {
                 continue;
@@ -134,8 +129,7 @@ public class InitTaskActuator extends AbstractTaskActuator {
      * @since 2019/10/17 13:47
      */
     private void insertToRedis(TaskEntity taskEntity) {
-        // 不需要定时分析，直接对比
-        String key = taskEntity.getReqMethod() + taskEntity.getReqUri();
+        String key = taskEntity.getModuleName() + taskEntity.getReqMethod() + taskEntity.getReqUri();
         String taskIdRedis = (String) redisUtil.hmGet(RedisKeyConstant.COMPARE_TASK_KEY, key);
         if (StringUtils.isBlank(taskIdRedis)) {
             taskIdRedis = "";
