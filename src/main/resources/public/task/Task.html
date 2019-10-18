@@ -254,12 +254,34 @@
             iconCls: "icon-save",
             onClick: function () {
                 var ansType = $("#ansTypeId").combobox('getValue');
+                var ansRateType = $("#ansRateTypeId").combobox('getValue');
+                var reqMethod = $("#reqMethodId").combobox('getValue');
+                var logSource = $("#logSourceId").combobox('getValue');
 
+                var tableName = $("#tableNameId").textbox('getValue');
+                var outQueue = $("#outQueueId").textbox('getValue');
+                var reqUri = $("#reqUriId").textbox('getValue');
+                var taskName = $("#taskNameId").textbox('getValue');
+                var moduleName = $("#moduleNameId").textbox('getValue');
+
+                if (!ansType && !moduleName && !taskName && !reqMethod && !reqUri && !logSource) {
+                    alert('请将数据填写完整');
+                    return;
+                }
                 if (ansType == 3) {
+                    $('#ansRateTypeId').combobox('setValue', null)
+                    $('#outQueueId').textbox('setValue', null);
+                    if (!tableName) {
+                        alert('请将数据填写完整');
+                        return;
+                    }
+                } else {
+                    if (!ansRateType && !outQueue) {
+                        alert('请将数据填写完整');
+                        return;
+                    }
 
                 }
-
-
                 $.messager.confirm('提示', '确认提交么?', function (r) {
                     if (r) {
                         $.ajax({
@@ -267,16 +289,16 @@
                             contentType: 'application/json;charset=utf-8',
                             method: 'post',
                             data: JSON.stringify({
-                                reqMethod: $("#reqMethodId").combobox('getValue'),
-                                ansType: $("#ansTypeId").combobox('getValue'),
-                                ansRateType: $("#ansRateTypeId").combobox('getValue'),
-                                logSource: $("#logSourceId").combobox('getValue'),
+                                reqMethod: reqMethod,
+                                ansType: ansType,
+                                ansRateType: ansRateType,
+                                logSource: logSource,
 
-                                tableName: $("#tableNameId").textbox('getValue'),
-                                taskName: $("#taskNameId").textbox('getValue'),
-                                moduleName: $("#moduleNameId").textbox('getValue'),
-                                reqUri: $("#reqUriId").textbox('getValue'),
-                                outQueue: $("#outQueueId").textbox('getValue')
+                                tableName: tableName,
+                                taskName: taskName,
+                                moduleName: moduleName,
+                                reqUri: reqUri,
+                                outQueue: outQueue
                             }),
                             success: function (viewData) {
                                 viewData = JSON.parse(viewData);
