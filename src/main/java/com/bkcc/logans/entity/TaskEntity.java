@@ -88,6 +88,13 @@ public class TaskEntity extends BaseEntity{
     private String beginTime;
 
     /**
+     * 【描 述】：需要对比数据的表名称
+     *
+     *  @since 2019/9/23 10:15
+     */
+    private String tableName;
+
+    /**
      * 【描 述】：任务结束时间
      *
      *  @since 2019/9/23 10:15

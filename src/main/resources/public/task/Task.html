@@ -264,7 +264,8 @@
                 var taskName = $("#taskNameId").textbox('getValue');
                 var moduleName = $("#moduleNameId").textbox('getValue');
 
-                if (!ansType && !moduleName && !taskName && !reqMethod && !reqUri && !logSource) {
+
+                if (!ansType || !moduleName || !taskName || !reqMethod || !reqUri || !logSource) {
                     alert('请将数据填写完整');
                     return;
                 }
@@ -276,11 +277,10 @@
                         return;
                     }
                 } else {
-                    if (!ansRateType && !outQueue) {
+                    if (!ansRateType) {
                         alert('请将数据填写完整');
                         return;
                     }
-
                 }
                 $.messager.confirm('提示', '确认提交么?', function (r) {
                     if (r) {
