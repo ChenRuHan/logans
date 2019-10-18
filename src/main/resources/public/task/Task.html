@@ -12,6 +12,296 @@
 <script>
     /*<![CDATA[*/
 
+    var taskGridArea = {
+        xtype: 'gridArea',
+        url: '/api/task/list4view',
+        singleSelect: true,
+        columns: [[
+            {field: 'id', checkbox: true},
+            {field: 'taskName', title: '任务名称', width: 40},
+            {field: 'moduleName', title: '微服务模块', width: 40},
+            {field: 'reqMethod', title: '请求的方法', width: 20},
+            {field: 'reqUri', title: '分析URI', width: 40},
+            {
+                field: 'ansType', title: '分析类型', width: 50, formatter: function (value) {
+                    switch (value) {
+                        case 1:
+                            return "不分析直接输出指定字段";
+                        case 2:
+                            return "通过指定字段聚合分析";
+                        case 3:
+                            return "通过指定字段对比修改数据";
+                    }
+                    return '';
+                }
+            },
+            {
+                field: 'logSource', title: '分析数据日志来源', width: 50, formatter: function (value) {
+                    switch (value) {
+                        case 1:
+                            return "通过ES获取";
+                        case 2:
+                            return "通过请求传入参数获取";
+                    }
+                    return '';
+                }
+            },
+            {
+                field: 'ansRateType', title: '分析频次', width: 30, formatter: function (value) {
+                    switch (value) {
+                        case 1:
+                            return "每分钟分析一次";
+                        case 2:
+                            return "每小时分析一次";
+                        case 3:
+                            return "每天分析一次";
+                        case 4:
+                            return "每月分析一次";
+                    }
+                    return "";
+                }
+            },
+            {field: 'outQueue', title: '输出消息队列', width: 20},
+            {field: 'tableName', title: '需要对比表名称', width: 20}
+        ]],
+        buttons: [{
+            text: '新建分析任务',
+            iconCls: 'icon-edit',
+            onClick: function () {
+                taskFormViewArea.showView();
+                $("#saveButton").show();
+            }
+        },{
+            text: '配置任务分析字段',
+            iconCls: 'icon-add',
+            onClick: function () {
+                var rowData = taskGridArea.datagrid('getSelected');
+                if (!rowData) {
+                    $.alert.info('请选中一条记录');
+                    return;
+                }
+
+                $("#fieldTaskIdId").textbox('setValue', rowData.id);
+                $("#fieldTaskNameId").textbox('setValue', rowData.taskName);
+
+                fieldGridArea.loadData({
+                    taskId: rowData.id
+                });
+                fieldViewArea.showView();
+            }
+        }, '-', {
+            text: '删除分析任务',
+            iconCls: 'icon-remove',
+            onClick: function () {
+                var rowData = taskGridArea.datagrid('getSelected');
+                if (!rowData) {
+                    $.alert.info('请选中一条记录');
+                    return;
+                }
+                $.messager.confirm('提示', '确认删除分析任务?', function (r) {
+                    if (r) {
+                        $.ajax({
+                            url: __ctx + '/api/task/' + rowData.id + '/delete',
+                            contentType: 'application/json;charset=utf-8',
+                            method: 'delete',
+                            success: function (viewData) {
+                                viewData = JSON.parse(viewData);
+                                if (!viewData.isSucceed) {
+                                    $.messager.alert('错误', viewData.message);
+                                    return;
+                                }
+                                taskGridArea.datagrid('reload');
+                            }
+                        })
+                    }
+                });
+            }
+        }],
+        onDblClickRow: function (rowIndex, rowData) {
+            resGridArea.loadData({
+                taskId: rowData.id
+            });
+        }
+
+    }
+
+
+    var logSourceDataList = [{
+        'id': '1',
+        'name': '通过ES获取'
+    }, {
+        'id': '2',
+        'name': '通过请求传入参数获取',
+        'selected': true
+    }];
+
+    var ansTypeDataList = [{
+        'id': '1',
+        'name': '不分析直接输出指定字段'
+    }, {
+        'id': '2',
+        'name': '通过指定字段聚合分析',
+        'selected': true
+    }, {
+        'id': '3',
+        'name': '通过指定字段对比修改数据'
+    }];
+    var ansRateTypeDataList = [{
+        'id': '1',
+        'name': '每分钟分析一次',
+        'selected': true
+    }, {
+        'id': '2',
+        'name': '每小时分析一次'
+    }, {
+        'id': '3',
+        'name': '每天分析一次'
+    }, {
+        'id': '4',
+        'name': '每月分析一次'
+    }];
+    var reqMethodDataList = [{
+        'id': 'GET',
+        'name': 'GET',
+        'selected': true
+    }, {
+        'id': 'POST',
+        'name': 'POST'
+    }, {
+        'id': 'DELETE',
+        'name': 'DELETE'
+    }, {
+        'id': 'PUT',
+        'name': 'PUT'
+    }];
+
+    var taskFormArea = {
+        xtype: "formArea",
+        title: "添加分析任务",
+        fields: [{
+            label: "分析任务中文名称",
+            xtype: "textbox",
+            name: "taskName",
+            id: "taskNameId"
+        }, {
+            label: "微服务模块名称",
+            xtype: "textbox",
+            name: "moduleName",
+            id: "moduleNameId"
+        }, {
+
+            label: "需要分析请求的方法",
+            xtype: "combobox",
+            name: "reqMethod",
+            id: "reqMethodId",
+            valueField: "id",
+            textField: "name",
+            data: reqMethodDataList
+        }, {
+            label: "需要分析请求的URI",
+            xtype: "textbox",
+            name: "reqUri",
+            id: "reqUriId"
+        }, {
+            label: "分析类型",
+            xtype: "combobox",
+            name: "ansType",
+            id: "ansTypeId",
+            valueField: "id",
+            textField: "name",
+            data: ansTypeDataList,
+            onChange: function (v) {
+                if (v == 3) {
+                    $('#ansRateTypeId').parent().hide()
+                    $('#outQueueId').parent().hide()
+                    $('#tableNameId').parent().show()
+                } else {
+                    $('#ansRateTypeId').parent().show();
+                    $('#outQueueId').parent().show();
+                    $('#tableNameId').parent().hide();
+                }
+            }
+        }, {
+            label: "分析频次",
+            xtype: "combobox",
+            name: "ansRateType",
+            id: "ansRateTypeId",
+            valueField: "id",
+            textField: "name",
+            data: ansRateTypeDataList
+        }, {
+            label: "分析数据来源",
+            xtype: "combobox",
+            name: "logSource",
+            id: "logSourceId",
+            valueField: "id",
+            textField: "name",
+            data: logSourceDataList
+        }, {
+            label: "输出消息队列",
+            xtype: "textbox",
+            name: "outQueue",
+            id: "outQueueId"
+        }, {
+            label: "对比表名称",
+            xtype: "textbox",
+            name: "tableName",
+            id: "tableNameId"
+        }],
+        buttons: [{
+            text: "保存",
+            id: "saveButton",
+            iconCls: "icon-save",
+            onClick: function () {
+                var ansType = $("#ansTypeId").combobox('getValue');
+
+                if (ansType == 3) {
+
+                }
+
+
+                $.messager.confirm('提示', '确认提交么?', function (r) {
+                    if (r) {
+                        $.ajax({
+                            url: __ctx + '/api/task',
+                            contentType: 'application/json;charset=utf-8',
+                            method: 'post',
+                            data: JSON.stringify({
+                                reqMethod: $("#reqMethodId").combobox('getValue'),
+                                ansType: $("#ansTypeId").combobox('getValue'),
+                                ansRateType: $("#ansRateTypeId").combobox('getValue'),
+                                logSource: $("#logSourceId").combobox('getValue'),
+
+                                tableName: $("#tableNameId").textbox('getValue'),
+                                taskName: $("#taskNameId").textbox('getValue'),
+                                moduleName: $("#moduleNameId").textbox('getValue'),
+                                reqUri: $("#reqUriId").textbox('getValue'),
+                                outQueue: $("#outQueueId").textbox('getValue')
+                            }),
+                            success: function (viewData) {
+                                viewData = JSON.parse(viewData);
+                                if (!viewData.isSucceed) {
+                                    $.messager.alert('错误', viewData.message);
+                                    return;
+                                }
+                                taskViewArea.showView();
+                                taskGridArea.datagrid('reload');
+                            }
+                        })
+                    }
+                });
+
+            }
+        }, {
+            text: "返回",
+            iconCls: "icon-back",
+            onClick: function () {
+                taskViewArea.showView();
+                taskGridArea.datagrid('reload');
+            }
+        }]
+    }
+
     var fieldEnumViewArea = {
         xtype: 'viewArea',
         id: 'tabsPage',
