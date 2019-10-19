@@ -1,6 +1,5 @@
 package com.bkcc.logans.actuator.abs;
 
-import com.bkcc.logans.entity.TaskEntity;
 import com.bkcc.logans.interceptor.inf.TaskExecuteInterceptor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @Slf4j
 public abstract class AbstractTaskActuator implements TaskExecuteInterceptor {
+    /**
+     * 【描 述】：任务ID
+     *
+     *  @since 2019/9/21 12:38
+     */
+    private Long taskId;
+
     /**
      * 【描 述】：任务单次执行单号
      *
@@ -79,13 +85,6 @@ public abstract class AbstractTaskActuator implements TaskExecuteInterceptor {
     public void afterExecute(Object res, Exception e) {}
 
     /**
-     * 【描 述】：执行任务实体类
-     *
-     *  @since 2019/9/21 12:38
-     */
-    private TaskEntity taskEntity;
-
-    /**
      * 【描 述】：执行任务方法
      *
      * @param
@@ -95,16 +94,5 @@ public abstract class AbstractTaskActuator implements TaskExecuteInterceptor {
      */
     public abstract Object execute();
 
-    /**
-     * 【描 述】：获取当前执行任务ID
-     *
-     * @param
-     * @return java.lang.Long
-     * @author 陈汝晗
-     * @since 2019/9/21 12:37
-     */
-    protected Long getTaskId(){
-        return taskEntity != null ? taskEntity.getId() : null;
-    }
 
 }///:~

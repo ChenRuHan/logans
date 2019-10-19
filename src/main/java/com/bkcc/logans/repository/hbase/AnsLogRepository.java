@@ -1,7 +1,9 @@
 package com.bkcc.logans.repository.hbase;
 
+import com.alibaba.fastjson.JSONObject;
 import com.bkcc.hbase.repository.AbstractHBaseRepository;
 import com.bkcc.logans.entity.hbase.AnsLogHbaseEntity;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -14,5 +16,28 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class AnsLogRepository extends AbstractHBaseRepository<AnsLogHbaseEntity>{
+
+    public JSONObject getArgsList(JSONObject arg, String pex) {
+        JSONObject returnJson = new JSONObject();
+        for (String key : arg.keySet()) {
+            String value = arg.getString(key);
+            try {
+                JSONObject child = JSONObject.parseObject(value);
+                if (StringUtils.isNotBlank(pex)) {
+                    returnJson.putAll(getArgsList(child, pex + "." + key));
+                } else {
+                    returnJson.putAll(getArgsList(child, key));
+                }
+            } catch (Exception e) {
+                if (StringUtils.isNotBlank(pex)) {
+                    returnJson.put(pex + "." + key, value);
+                } else {
+                    returnJson.put(key, value);
+                }
+            }
+        }
+        return returnJson;
+    }
+
 
 }///:~

@@ -215,7 +215,7 @@ public class TaskController extends BaseController{
 
     @GetMapping("/{taskId}/trigger")
     public ViewData trigger(@PathVariable Long taskId) {
-        actuator.setTaskEntity(taskService.selectTaskById(taskId));
+        actuator.setTaskId(taskId);
         TaskHandler taskHandler = new TaskHandler(taskDispatch, actuator);
         new Thread(taskHandler).start();
         return ViewData.ok();

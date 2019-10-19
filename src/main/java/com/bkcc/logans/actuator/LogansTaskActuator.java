@@ -3,6 +3,7 @@ package com.bkcc.logans.actuator;
 import com.alibaba.fastjson.JSONObject;
 import com.bkcc.hbase.util.HBaseUtil;
 import com.bkcc.logans.actuator.abs.AbstractTaskActuator;
+import com.bkcc.logans.constant.TaskConstant;
 import com.bkcc.logans.entity.FieldEntity;
 import com.bkcc.logans.entity.FieldEnumEntity;
 import com.bkcc.logans.entity.TaskEntity;
@@ -112,7 +113,7 @@ public class LogansTaskActuator extends AbstractTaskActuator {
      */
     @Override
     public Object execute() {
-        TaskEntity taskEntity = getTaskEntity();
+        TaskEntity taskEntity = TaskConstant.TASK_MAP.get(getTaskId());
         List<FieldEntity> fieldList = fieldService.selectFieldListByTaskId(getTaskId());
         if (fieldList == null || fieldList.isEmpty()) {
             log.debug("# 没有需要分析的列,直接返回, taskId:{}", taskEntity.getId());
@@ -196,7 +197,7 @@ public class LogansTaskActuator extends AbstractTaskActuator {
         if (res == null) {
             res = new Object();
         }
-        TaskEntity taskEntity = getTaskEntity();
+        TaskEntity taskEntity = TaskConstant.TASK_MAP.get(getTaskId());
         /*
             通过mq通知分析结果
          */
@@ -224,7 +225,7 @@ public class LogansTaskActuator extends AbstractTaskActuator {
      */
     @Override
     public boolean preExecute() {
-        TaskEntity taskEntity = getTaskEntity();
+        TaskEntity taskEntity = TaskConstant.TASK_MAP.get(getTaskId());
         if (taskEntity == null) {
             return false;
         }

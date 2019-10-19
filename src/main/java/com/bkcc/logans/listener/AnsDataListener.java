@@ -2,9 +2,16 @@ package com.bkcc.logans.listener;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bkcc.hbase.util.HBaseUtil;
+import com.bkcc.logans.constant.TaskConstant;
+import com.bkcc.logans.entity.TaskEntity;
 import com.bkcc.logans.entity.hbase.AnsLogHbaseEntity;
+import com.bkcc.logans.entity.hbase.TableHbaseEntity;
+import com.bkcc.logans.enums.AnsTypeEnum;
 import com.bkcc.logans.repository.hbase.AnsLogRepository;
+import com.bkcc.logans.repository.hbase.TableRepository;
+import com.bkcc.logans.service.FieldService;
 import com.bkcc.logans.util.EncryptAndDecryptUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
@@ -29,6 +36,16 @@ public class AnsDataListener {
      */
     @Autowired
     private AnsLogRepository ansLogRepository;
+    /**
+     * 【描 述】：HBASE日数据库表数据接口
+     *
+     *  @since 2019/10/19 09:38
+     */
+    @Autowired
+    private TableRepository tableRepository;
+
+    @Autowired
+    private FieldService fieldService;
 
 
     /**
@@ -59,14 +76,43 @@ public class AnsDataListener {
         String moduleName = json.getString("moduleName");
         String method = json.getString("method");
         String uri = json.getString("uri");
+        String taskIds = json.getString("taskIds");
 
-        String encrypt = EncryptAndDecryptUtil.encrypt(moduleName + method + uri);
+        String mmu = moduleName + method + uri;
+        String encrypt = EncryptAndDecryptUtil.encrypt(mmu).substring(0, 1) + mmu;
+
         Date date = new Date(json.getInteger("startTimeMillis"));
         String startTime = FastDateFormat.getInstance("yyyyMMddHHmmssSSS").format(date);
         String random = HBaseUtil.getRandomNum(4);
         ansLogHbaseEntity.setRowKey(encrypt + "-" + startTime + "-" + random);
         ansLogHbaseEntity.setData(jsonStr);
         ansLogRepository.save(ansLogHbaseEntity);
+
+        for (String s : taskIds.split(",")) {
+            Long taskId = Long.parseLong(s);
+            TaskEntity taskEntity = TaskConstant.TASK_MAP.get(taskId);
+            if (!AnsTypeEnum.COMPARE_ANS.equels(taskEntity.getAnsType())) {
+                continue;
+            }
+            if (StringUtils.isBlank(taskEntity.getUniqueField())) {
+                continue;
+            }
+            JSONObject arg = ansLogRepository.getArgsList(json.getJSONObject("args"), null);
+            StringBuffer unidx = new StringBuffer();
+            for (String key : taskEntity.getUniqueField().split(",")) {
+                if (arg.containsKey(key)) {
+                    unidx.append(arg.get(key));
+                }
+            }
+            TableHbaseEntity tableHbaseEntity = new TableHbaseEntity();
+            String mtu = taskEntity.getModuleName() + taskEntity.getTableName() + "-" + unidx.toString();
+            encrypt = EncryptAndDecryptUtil.encrypt(mtu).substring(0, 1) + mtu;
+            tableHbaseEntity.setRowKey(encrypt + "-" + HBaseUtil.getAscCurrent());
+            tableHbaseEntity.setData(arg.toJSONString());
+            tableHbaseEntity.setTime(FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss").format(date));
+            tableHbaseEntity.setUid(json.getLong("uid"));
+            tableRepository.save(tableHbaseEntity);
+        }
     }
 
 

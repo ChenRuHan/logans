@@ -95,6 +95,13 @@ public class TaskEntity extends BaseEntity{
     private String tableName;
 
     /**
+     * 【描 述】：table中的唯一字段，多个用应为,分割
+     *
+     *  @since 2019/10/19 10:13
+     */
+    private String uniqueField;
+
+    /**
      * 【描 述】：任务结束时间
      *
      *  @since 2019/9/23 10:15

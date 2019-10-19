@@ -2,8 +2,8 @@ package com.bkcc.logans.handler;
 
 import com.bkcc.core.util.UniqueIdUtil;
 import com.bkcc.logans.actuator.abs.AbstractTaskActuator;
+import com.bkcc.logans.constant.TaskConstant;
 import com.bkcc.logans.dispatch.abs.AbstractTaskDispatch;
-import com.bkcc.logans.entity.TaskEntity;
 import com.bkcc.logans.util.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,9 +27,9 @@ public class TaskHandler implements Runnable{
      */
     @Override
     public void run() {
-        TaskEntity task = actuator.getTaskEntity();
-        if (!taskDispatch.canExecute(task.getId())) {
-            log.info("# 本次任务不执行. taskId:{}", task.getId());
+        Long taskId = actuator.getTaskId();
+        if (!taskDispatch.canExecute(taskId)) {
+            log.info("# 本次任务不执行. taskId:{}", taskId);
             return;
         }
         Object res = null;
@@ -40,13 +40,13 @@ public class TaskHandler implements Runnable{
             actuator.setOrderNO(taskNO);
             actuator.setExeBeginTime(DateTimeUtils.formatDate());
             actuator.preExecute();
-            log.debug("# begin执行任务taskNO:{}, {}", taskNO, task);
+            log.debug("# begin执行任务taskNO:{}, {}", taskNO, TaskConstant.TASK_MAP.get(taskId));
             res = actuator.execute();
-            log.debug("# end执行任务taskNO:{}, success, taskId:{}, 耗时:{}毫秒", taskNO, task.getId(), (System.currentTimeMillis() - tl));
+            log.debug("# end执行任务taskNO:{}, success, taskId:{}, 耗时:{}毫秒", taskNO, taskId, (System.currentTimeMillis() - tl));
             actuator.setExeEndTime(DateTimeUtils.formatDate());
             actuator.afterExecuteSuccess(res);
         } catch (Exception e) {
-            log.debug("# end执行任务taskNO:{}, fail, taskId:{}, 耗时:{}毫秒, errorMsg:{}", taskNO, task.getId(), (System.currentTimeMillis() - tl), e.getMessage(), e);
+            log.debug("# end执行任务taskNO:{}, fail, taskId:{}, 耗时:{}毫秒, errorMsg:{}", taskNO, taskId, (System.currentTimeMillis() - tl), e.getMessage(), e);
             actuator.setExeEndTime(DateTimeUtils.formatDate());
             actuator.afterExecuteError(e);
             e1 = e;

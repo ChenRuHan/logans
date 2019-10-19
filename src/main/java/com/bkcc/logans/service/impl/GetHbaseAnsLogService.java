@@ -7,7 +7,6 @@ import com.bkcc.logans.entity.hbase.AnsLogHbaseEntity;
 import com.bkcc.logans.repository.hbase.AnsLogRepository;
 import com.bkcc.logans.service.GetAnsLogService;
 import com.bkcc.logans.util.EncryptAndDecryptUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +41,8 @@ public class GetHbaseAnsLogService implements GetAnsLogService {
      */
     @Override
     public List<JSONObject> getAnsLogList(TaskEntity taskEntity) {
-        String encrypt = EncryptAndDecryptUtil.encrypt(taskEntity.getModuleName() + taskEntity.getReqMethod() + taskEntity.getReqUri());
+        String mmu = taskEntity.getModuleName() + taskEntity.getReqMethod() + taskEntity.getReqUri();
+        String encrypt = EncryptAndDecryptUtil.encrypt(mmu).substring(0, 1) + mmu;
         String beginTime = taskEntity.getBeginTime().replaceAll("\\D", "") + "000";
         String endTime = taskEntity.getEndTime().replaceAll("\\D", "") + "000";
         String random = HBaseUtil.getRandomNum(4);
@@ -56,35 +56,12 @@ public class GetHbaseAnsLogService implements GetAnsLogService {
         for (AnsLogHbaseEntity vo : list) {
             JSONObject json = JSONObject.parseObject(vo.getData());
             JSONObject argJson = json.getJSONObject("args");
-            returnList.addAll(getArgsList(argJson, null));
+            json.putAll(ansLogRepository.getArgsList(argJson, null));
             json.remove("args");
+            json.remove("resultObj");
             returnList.add(json);
         }
         return returnList;
-    }
-
-    private List<JSONObject> getArgsList(JSONObject arg, String pex) {
-        List<JSONObject> list = new ArrayList<>();
-        for (String key : arg.keySet()) {
-            String value = arg.getString(key);
-            try {
-                JSONObject jsonObject = JSONObject.parseObject(value);
-                if (StringUtils.isNotBlank(pex)) {
-                    list.addAll(getArgsList(jsonObject, pex + "." + key));
-                } else {
-                    list.addAll(getArgsList(jsonObject, key));
-                }
-            } catch (Exception e) {
-                JSONObject child = new JSONObject();
-                if (StringUtils.isNotBlank(pex)) {
-                    child.put(pex + "." + key, value);
-                } else {
-                    child.put(key, value);
-                }
-                list.add(child);
-            }
-        }
-        return list;
     }
 
 

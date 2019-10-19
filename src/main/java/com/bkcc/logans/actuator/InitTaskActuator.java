@@ -3,6 +3,7 @@ package com.bkcc.logans.actuator;
 import com.bkcc.logans.actuator.abs.AbstractTaskActuator;
 import com.bkcc.logans.config.LogansSchedulingConfigurer;
 import com.bkcc.logans.constant.RedisKeyConstant;
+import com.bkcc.logans.constant.TaskConstant;
 import com.bkcc.logans.dispatch.abs.AbstractTaskDispatch;
 import com.bkcc.logans.entity.TaskEntity;
 import com.bkcc.logans.handler.TaskHandler;
@@ -18,7 +19,6 @@ import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -36,8 +36,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 public class InitTaskActuator extends AbstractTaskActuator {
-
-    private static Map<Long, ScheduledTask> SCHEDULED_TASK_MAP = new HashMap<>();
 
 
     /**
@@ -86,20 +84,21 @@ public class InitTaskActuator extends AbstractTaskActuator {
             insertToRedis(taskEntity);
             Long taskId = taskEntity.getId();
             taskIdSet.add(taskId);
-            if (SCHEDULED_TASK_MAP.containsKey(taskId)) {
+            if (TaskConstant.SCHEDULED_TASK_MAP.containsKey(taskId)) {
                 continue;
             }
+            TaskConstant.TASK_MAP.put(taskId, taskEntity);
             AbstractTaskActuator actuator = applicationContext.getBean("logansTaskActuator", AbstractTaskActuator.class);
-            actuator.setTaskEntity(taskEntity);
+            actuator.setTaskId(taskId);
             TaskHandler taskHandler = new TaskHandler(taskDispatch, actuator);
             CronTask cronTask = new CronTask(new Thread(taskHandler), taskEntity.getAnsCronByAnsRateType());
             ScheduledTask scheduledTask = taskRegistrar.scheduleCronTask(cronTask);
-            SCHEDULED_TASK_MAP.put(taskId, scheduledTask);
+            TaskConstant.SCHEDULED_TASK_MAP.put(taskId, scheduledTask);
         }
         /*
             去掉多余任务
          */
-        Iterator<Map.Entry<Long, ScheduledTask>> it = SCHEDULED_TASK_MAP.entrySet().iterator();
+        Iterator<Map.Entry<Long, ScheduledTask>> it = TaskConstant.SCHEDULED_TASK_MAP.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<Long, ScheduledTask> m = it.next();
             Long taskId = m.getKey();
@@ -109,6 +108,7 @@ public class InitTaskActuator extends AbstractTaskActuator {
                 redisUtil.hmDel(RedisKeyConstant.TASK_KEY, taskId);
                 task.cancel();
                 it.remove();
+                TaskConstant.TASK_MAP.remove(taskId);
             }
         }
         if (redisUtil.exists(RedisKeyConstant.COMPARE_TASK_KEY)) {

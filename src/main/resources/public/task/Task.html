@@ -215,10 +215,12 @@
                     $('#ansRateTypeId').parent().hide()
                     $('#outQueueId').parent().hide()
                     $('#tableNameId').parent().show()
+                    $('#uniqueFieldId').parent().show()
                 } else {
                     $('#ansRateTypeId').parent().show();
                     $('#outQueueId').parent().show();
                     $('#tableNameId').parent().hide();
+                    $('#uniqueFieldId').parent().hide();
                 }
             }
         }, {
@@ -247,6 +249,11 @@
             xtype: "textbox",
             name: "tableName",
             id: "tableNameId"
+        }, {
+            label: "唯一索引字段(多个用,分割)",
+            xtype: "textbox",
+            name: "uniqueField",
+            id: "uniqueFieldId"
         }],
         buttons: [{
             text: "保存",
@@ -263,6 +270,7 @@
                 var reqUri = $("#reqUriId").textbox('getValue');
                 var taskName = $("#taskNameId").textbox('getValue');
                 var moduleName = $("#moduleNameId").textbox('getValue');
+                var uniqueField = $("#uniqueFieldId").textbox('getValue');
 
 
                 if (!ansType || !moduleName || !taskName || !reqMethod || !reqUri || !logSource) {
@@ -272,7 +280,7 @@
                 if (ansType == 3) {
                     $('#ansRateTypeId').combobox('setValue', null)
                     $('#outQueueId').textbox('setValue', null);
-                    if (!tableName) {
+                    if (!tableName || !uniqueField) {
                         alert('请将数据填写完整');
                         return;
                     }
@@ -295,6 +303,7 @@
                                 logSource: logSource,
 
                                 tableName: tableName,
+                                uniqueField: uniqueField,
                                 taskName: taskName,
                                 moduleName: moduleName,
                                 reqUri: reqUri,

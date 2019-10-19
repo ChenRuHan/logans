@@ -21,7 +21,7 @@ public class AnsLogHbaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 【描 述】：(模块+请求方法+请求uri 加密之后的值)-(请求日期yyyyMMddHHmmssSSS)-(4位随机数)
+     * 【描 述】：((模块+请求方法+请求uri)加密之后第一个字符)(模块+请求方法+请求uri)-(请求日期yyyyMMddHHmmssSSS)-(4位随机数)
      *
      *  @since  Jul 17, 2019 v1.0
      */
