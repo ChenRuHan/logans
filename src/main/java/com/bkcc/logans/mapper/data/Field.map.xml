@@ -52,7 +52,7 @@
             <if test="fieldRemark != null and fieldRemark != ''">
                 AND field_remark LIKE CONCAT('%', #{fieldRemark}, '%')
             </if>
-        ORDER BY id DESC
+        ORDER BY id
     </select>
     
 </mapper>

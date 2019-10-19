@@ -88,6 +88,12 @@ public class AnsDataListener {
         ansLogHbaseEntity.setData(jsonStr);
         ansLogRepository.save(ansLogHbaseEntity);
 
+        if (!StringUtils.equals("success", json.getString("resultStatus"))) {
+            return;
+        }
+        /*
+            插入logans:table表中
+         */
         for (String s : taskIds.split(",")) {
             Long taskId = Long.parseLong(s);
             TaskEntity taskEntity = TaskConstant.TASK_MAP.get(taskId);
