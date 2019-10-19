@@ -82,6 +82,10 @@ public class InitTaskActuator extends AbstractTaskActuator {
                 continue;
             }
             insertToRedis(taskEntity);
+
+            if (taskEntity.getAnsRateType() == null) {
+                continue;
+            }
             Long taskId = taskEntity.getId();
             taskIdSet.add(taskId);
             if (TaskConstant.SCHEDULED_TASK_MAP.containsKey(taskId)) {

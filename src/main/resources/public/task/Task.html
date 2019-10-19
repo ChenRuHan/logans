@@ -278,8 +278,8 @@
                     return;
                 }
                 if (ansType == 3) {
-                    $('#ansRateTypeId').combobox('setValue', null)
-                    $('#outQueueId').textbox('setValue', null);
+                    ansRateType = null;
+                    outQueue = null;
                     if (!tableName || !uniqueField) {
                         alert('请将数据填写完整');
                         return;
