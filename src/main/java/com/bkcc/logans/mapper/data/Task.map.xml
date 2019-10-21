@@ -54,7 +54,9 @@
     </select>
     
     <select id="selectTaskList" resultType="com.bkcc.logans.entity.TaskEntity">
-        SELECT id, task_name taskName, module_name moduleName, req_method reqMethod, req_uri reqUri, ans_type ansType, ans_rate_type ansRateType, out_queue outQueue, log_source logSource, unique_field uniqueField
+        SELECT id, task_name taskName, module_name moduleName, req_method reqMethod
+             , req_uri reqUri, ans_type ansType, ans_rate_type ansRateType, out_queue outQueue
+             , log_source logSource, unique_field uniqueField, table_name tableName
         FROM logans_task  
         WHERE 1 = 1 
             <if test="taskName != null and taskName != ''"> 

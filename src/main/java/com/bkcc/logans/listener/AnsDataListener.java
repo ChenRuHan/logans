@@ -3,6 +3,7 @@ package com.bkcc.logans.listener;
 import com.alibaba.fastjson.JSONObject;
 import com.bkcc.hbase.util.HBaseUtil;
 import com.bkcc.logans.constant.TaskConstant;
+import com.bkcc.logans.entity.FieldEntity;
 import com.bkcc.logans.entity.TaskEntity;
 import com.bkcc.logans.entity.hbase.AnsLogHbaseEntity;
 import com.bkcc.logans.entity.hbase.TableHbaseEntity;
@@ -18,6 +19,7 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 【描 述】：监听需要分析的数据
@@ -81,7 +83,7 @@ public class AnsDataListener {
         String mmu = moduleName + method + uri;
         String encrypt = EncryptAndDecryptUtil.encrypt(mmu).substring(0, 1) + mmu;
 
-        Date date = new Date(json.getInteger("startTimeMillis"));
+        Date date = new Date(json.getLong("startTimeMillis"));
         String startTime = FastDateFormat.getInstance("yyyyMMddHHmmssSSS").format(date);
         String random = HBaseUtil.getRandomNum(4);
         ansLogHbaseEntity.setRowKey(encrypt + "-" + startTime + "-" + random);
@@ -97,13 +99,30 @@ public class AnsDataListener {
         for (String s : taskIds.split(",")) {
             Long taskId = Long.parseLong(s);
             TaskEntity taskEntity = TaskConstant.TASK_MAP.get(taskId);
+            if (taskEntity == null) {
+                continue;
+            }
             if (!AnsTypeEnum.COMPARE_ANS.equels(taskEntity.getAnsType())) {
                 continue;
             }
             if (StringUtils.isBlank(taskEntity.getUniqueField())) {
                 continue;
             }
+            List<FieldEntity> fieldList = fieldService.selectFieldListByTaskId(taskId);
+            if (fieldList == null || fieldList.isEmpty()) {
+                continue;
+            }
             JSONObject arg = ansLogRepository.getArgsList(json.getJSONObject("args"), null);
+
+
+            JSONObject data = new JSONObject();
+            for (FieldEntity fieldEntity : fieldList) {
+                String key = fieldEntity.getFieldKey();
+                if (arg.containsKey(key)) {
+                    data.put(key, arg.get(key));
+                }
+            }
+
             StringBuffer unidx = new StringBuffer();
             for (String key : taskEntity.getUniqueField().split(",")) {
                 if (arg.containsKey(key)) {
@@ -114,7 +133,7 @@ public class AnsDataListener {
             String mtu = taskEntity.getModuleName() + taskEntity.getTableName() + "-" + unidx.toString();
             encrypt = EncryptAndDecryptUtil.encrypt(mtu).substring(0, 1) + mtu;
             tableHbaseEntity.setRowKey(encrypt + "-" + HBaseUtil.getAscCurrent());
-            tableHbaseEntity.setData(arg.toJSONString());
+            tableHbaseEntity.setData(data.toJSONString());
             tableHbaseEntity.setTime(FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss").format(date));
             tableHbaseEntity.setUid(json.getLong("uid"));
             tableRepository.save(tableHbaseEntity);

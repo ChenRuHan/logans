@@ -194,7 +194,7 @@ public class TaskResController extends BaseController {
         if (list.size() < pageSize) {
             nextRowKey = null;
         } else {
-            TableHbaseEntity last = list.remove(list.size());
+            TableHbaseEntity last = list.remove(list.size() - 1);
             nextRowKey = last.getRowKey();
         }
         ViewData viewData = new ViewData();
