@@ -9,13 +9,11 @@ package com.bkcc.logans.constant;
  */
 public class RedisKeyConstant {
 
-    public static final String TASK_KEY = "logans:task";
-
     public static final String IP_KEY = "logans:ip";
 
     public static final String LOGANS_ANS = "logans:ans";
 
-    public static final String TASK_LAST_EXE_TIME = "logans:lastexe:";
+    public static final String TASK_EXE_KEY = "logans:exe:";
 
     public static final int EXPIRE_TIME = 90;
 

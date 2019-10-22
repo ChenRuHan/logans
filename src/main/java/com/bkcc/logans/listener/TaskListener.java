@@ -108,7 +108,7 @@ public class TaskListener {
             return;
         }
         scheduledTask.cancel();
-        redisUtil.remove(RedisKeyConstant.TASK_LAST_EXE_TIME);
+        redisUtil.remove(RedisKeyConstant.TASK_EXE_KEY);
     }
 
 

@@ -1,5 +1,6 @@
 package com.bkcc.logans.dispatch;
 
+import com.alibaba.fastjson.JSONObject;
 import com.bkcc.logans.constant.RedisKeyConstant;
 import com.bkcc.logans.constant.TaskConstant;
 import com.bkcc.logans.dispatch.abs.AbstractTaskDispatch;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 【描 述】：轮询式任务调度器，任务轮询在每台机器中执行
@@ -49,55 +49,45 @@ public class PollTaskDispatch extends AbstractTaskDispatch {
            解决多个服务器时间差问题。判断任务在当前时间段是否已经执行
          */
         String now = FastDateFormat.getInstance("yyyyMMddHHmm").format(new Date());
-        String lastExeTimeKey = RedisKeyConstant.TASK_LAST_EXE_TIME + taskId;
-        String lastExeTime = redisUtil.getString(lastExeTimeKey);
+        String lastExeTimeKey = RedisKeyConstant.TASK_EXE_KEY + taskId;
+        JSONObject lastJson = new JSONObject();
+        String lastJsonStr = redisUtil.getString(lastExeTimeKey);
+        if (StringUtils.isNotBlank(lastJsonStr)) {
+            lastJson = JSONObject.parseObject(lastJsonStr);
+        }
+        String lastExeTime = lastJson.getString("time");
         if (StringUtils.equals(lastExeTime, now)) {
             return false;
         }
-
-        redisUtil.set(lastExeTimeKey, now, TaskConstant.getExpireTime(taskId));
-
-        String lastExeIp = (String) redisUtil.hmGet(RedisKeyConstant.TASK_KEY, taskId);
-        String nextIp = "";
-        if (StringUtils.isBlank(lastExeIp)) {
+        String lastExeIpAndPort = lastJson.getString("ipPort");
+        String nextCanExeIpPort = "";
+        if (StringUtils.isBlank(lastExeIpAndPort)) {
             Set<Object> keys = redisUtil.hmKeys(RedisKeyConstant.IP_KEY);
             for (Object key : keys) {
-                nextIp = key.toString();
+                nextCanExeIpPort = key.toString();
                 break;
             }
         } else {
-            nextIp = (String) redisUtil.hmGet(RedisKeyConstant.IP_KEY, lastExeIp);
+            nextCanExeIpPort = (String) redisUtil.hmGet(RedisKeyConstant.IP_KEY, lastExeIpAndPort);
             /*
                 如果查询不到，证明该节点已经下线，重新轮询。
              */
-            if (StringUtils.isBlank(nextIp)) {
+            if (StringUtils.isBlank(nextCanExeIpPort)) {
                 Set<Object> keys = redisUtil.hmKeys(RedisKeyConstant.IP_KEY);
                 for (Object key : keys) {
-                    nextIp = key.toString();
+                    nextCanExeIpPort = key.toString();
                     break;
                 }
             }
         }
-        if (StringUtils.equals(nextIp, ip + ":" + port)) {
+        String currIpPort = ip + ":" + port;
+        if (StringUtils.equals(nextCanExeIpPort, currIpPort)) {
+            lastJson.put("time", now);
+            lastJson.put("ipPort", currIpPort);
+            redisUtil.set(lastExeTimeKey, lastJson.toJSONString(), TaskConstant.getExpireTime(taskId));
             return true;
         }
         return false;
     }
-
-
-    /**
-     * 【描 述】：执行完毕之后执行
-     *
-     * @param taskId
-     * @return void
-     * @author 陈汝晗
-     * @since 2019/10/22 14:10
-     */
-    @Override
-    public void afterExecute(Long taskId) {
-        redisUtil.hmSet(RedisKeyConstant.TASK_KEY, taskId, ip + ":" + port);
-        redisUtil.expire(RedisKeyConstant.TASK_KEY, TaskConstant.getExpireTime(taskId).intValue(), TimeUnit.SECONDS);
-    }
-
 
 }///:~
