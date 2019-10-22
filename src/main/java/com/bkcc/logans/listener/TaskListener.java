@@ -23,7 +23,6 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 【描 述】：任务列表监听类
@@ -91,13 +90,14 @@ public class TaskListener {
         if (task == null) {
             return;
         }
-        ScheduledTaskRegistrar taskRegistrar = logansSchedulingConfigurer.getTaskRegistrar();
-        if (taskRegistrar == null) {
-            return;
-        }
         Long taskId = task.getId();
         TaskConstant.TASK_MAP.put(taskId, task);
+        insertTask2Redis(task);
         if (task.getAnsRateType() == null) {
+            return;
+        }
+        ScheduledTaskRegistrar taskRegistrar = logansSchedulingConfigurer.getTaskRegistrar();
+        if (taskRegistrar == null) {
             return;
         }
         AbstractTaskActuator actuator = applicationContext.getBean("logansTaskActuator", AbstractTaskActuator.class);
@@ -106,7 +106,6 @@ public class TaskListener {
         CronTask cronTask = new CronTask(new Thread(taskHandler), task.getAnsCronByAnsRateType());
         ScheduledTask scheduledTask = taskRegistrar.scheduleCronTask(cronTask);
         TaskConstant.SCHEDULED_TASK_MAP.put(taskId, scheduledTask);
-        insertTask2Redis(task);
     }
 
     /**
@@ -122,14 +121,13 @@ public class TaskListener {
             return;
         }
         Long taskId = task.getId();
-        ScheduledTask scheduledTask = TaskConstant.SCHEDULED_TASK_MAP.get(taskId);
+        removeTask2Redis(task);
+        TaskConstant.TASK_MAP.remove(taskId);
+        ScheduledTask scheduledTask = TaskConstant.SCHEDULED_TASK_MAP.remove(taskId);
         if (scheduledTask == null) {
             return;
         }
         scheduledTask.cancel();
-        TaskConstant.SCHEDULED_TASK_MAP.remove(taskId);
-        TaskConstant.TASK_MAP.remove(taskId);
-        removeTask2Redis(task);
     }
 
 
@@ -144,16 +142,13 @@ public class TaskListener {
     private void insertTask2Redis(TaskEntity taskEntity) {
         String key = taskEntity.getModuleName() + taskEntity.getReqMethod() + taskEntity.getReqUri();
         String taskId = taskEntity.getId() + "";
-        String value = (String) redisUtil.hmGet(RedisKeyConstant.COMPARE_TASK_KEY, key);
+        String value = (String) redisUtil.hmGet(RedisKeyConstant.LOGANS_ANS, key);
         if (StringUtils.isBlank(value)) {
             value = taskId;
         } else {
             value += "," + taskId;
         }
-        redisUtil.hmSet(RedisKeyConstant.COMPARE_TASK_KEY, key, value);
-        if (redisUtil.exists(RedisKeyConstant.COMPARE_TASK_KEY)) {
-            redisUtil.expire(RedisKeyConstant.COMPARE_TASK_KEY, 90, TimeUnit.SECONDS);
-        }
+        redisUtil.hmSet(RedisKeyConstant.LOGANS_ANS, key, value);
     }
 
 
@@ -168,7 +163,7 @@ public class TaskListener {
     private void removeTask2Redis(TaskEntity taskEntity) {
         String key = taskEntity.getModuleName() + taskEntity.getReqMethod() + taskEntity.getReqUri();
         String taskId = taskEntity.getId() + "";
-        String value = (String) redisUtil.hmGet(RedisKeyConstant.COMPARE_TASK_KEY, key);
+        String value = (String) redisUtil.hmGet(RedisKeyConstant.LOGANS_ANS, key);
         if (StringUtils.isBlank(value)) {
             return;
         }
@@ -184,12 +179,9 @@ public class TaskListener {
             sb.append(",").append(s);
         }
         if (StringUtils.isBlank(sb)) {
-            redisUtil.hmDel(RedisKeyConstant.COMPARE_TASK_KEY, key);
+            redisUtil.hmDel(RedisKeyConstant.LOGANS_ANS, key);
         }
-        redisUtil.hmSet(RedisKeyConstant.COMPARE_TASK_KEY, key, sb.substring(1));
-        if (redisUtil.exists(RedisKeyConstant.COMPARE_TASK_KEY)) {
-            redisUtil.expire(RedisKeyConstant.COMPARE_TASK_KEY, 90, TimeUnit.SECONDS);
-        }
+        redisUtil.hmSet(RedisKeyConstant.LOGANS_ANS, key, sb.substring(1));
     }
 
 

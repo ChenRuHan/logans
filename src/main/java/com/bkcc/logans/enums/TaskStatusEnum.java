@@ -2,8 +2,8 @@ package com.bkcc.logans.enums;
 
 public enum TaskStatusEnum {
 
-    OPEN(0, "暂停"),
-    CLOSE(1, "开启");
+    OPEN(1, "开启"),
+    CLOSE(0, "暂停");
 
     private Integer value;
 

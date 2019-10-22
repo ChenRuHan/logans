@@ -13,7 +13,9 @@ public class RedisKeyConstant {
 
     public static final String IP_KEY = "logans:ip";
 
-    public static final String COMPARE_TASK_KEY = "logans:ans";
+    public static final String LOGANS_ANS = "logans:ans";
+
+    public static final int EXPIRE_TIME = 90;
 
     private RedisKeyConstant() {}
 }///:~

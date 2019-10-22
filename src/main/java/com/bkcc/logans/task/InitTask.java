@@ -89,7 +89,7 @@ public class InitTask {
             }
             redisUtil.hmSet(RedisKeyConstant.IP_KEY, cur, next);
         }
-        redisUtil.expire(RedisKeyConstant.IP_KEY, 60, TimeUnit.SECONDS);
+        redisUtil.expire(RedisKeyConstant.IP_KEY, RedisKeyConstant.EXPIRE_TIME, TimeUnit.SECONDS);
     }
 
 }///:~
