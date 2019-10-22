@@ -120,23 +120,7 @@ public class TaskListener {
      * @since 2019/10/17 13:47
      */
     public void insertTask2Redis(TaskEntity taskEntity) {
-        if (taskEntity == null) {
-            return;
-        }
-        String key = taskEntity.getModuleName() + taskEntity.getReqMethod() + taskEntity.getReqUri();
-        String taskId = taskEntity.getId() + "";
-        String value = (String) redisUtil.hmGet(RedisKeyConstant.LOGANS_ANS, key);
-        if (StringUtils.isBlank(value)) {
-            value = taskId;
-        } else {
-            Set<String> idSet = new HashSet<>(Arrays.asList(value.split(",")));
-            if (idSet.contains(taskId)) {
-                return;
-            }
-            value += "," + taskId;
-        }
-        redisUtil.hmSet(RedisKeyConstant.LOGANS_ANS, key, value);
-        redisUtil.expire(RedisKeyConstant.LOGANS_ANS, RedisKeyConstant.EXPIRE_TIME, TimeUnit.SECONDS);
+        setValue(taskEntity, TaskConstant.INSERT_STATUS);
     }
 
 
@@ -149,32 +133,40 @@ public class TaskListener {
      * @since 2019/10/17 13:47
      */
     public void removeTask2Redis(TaskEntity taskEntity) {
+        setValue(taskEntity, TaskConstant.DELETE_STATUS);
+    }
+
+    private void setValue(TaskEntity taskEntity, String method) {
         if (taskEntity == null) {
             return;
         }
         String key = taskEntity.getModuleName() + taskEntity.getReqMethod() + taskEntity.getReqUri();
         String taskId = taskEntity.getId() + "";
         String value = (String) redisUtil.hmGet(RedisKeyConstant.LOGANS_ANS, key);
-        if (StringUtils.isBlank(value)) {
-            return;
+        Set<String> idSet = new HashSet<>();
+        if (StringUtils.isNotBlank(value)) {
+            idSet = new HashSet<>(Arrays.asList(value.split(",")));
         }
-        Set<String> idSet = new HashSet<>(Arrays.asList(value.split(",")));
-        if (!idSet.contains(taskId)) {
+        if (StringUtils.equals(method, TaskConstant.DELETE_STATUS)) {
+            idSet.remove(taskId);
+        } else if (StringUtils.equals(method, TaskConstant.INSERT_STATUS)) {
+            idSet.add(taskId);
+        }
+        if (idSet == null || idSet.isEmpty()) {
+            redisUtil.hmDel(RedisKeyConstant.LOGANS_ANS, key);
             return;
         }
         StringBuffer sb = new StringBuffer();
         for (String s : idSet) {
-            if (StringUtils.equals(s, taskId)) {
-                continue;
-            }
             sb.append(",").append(s);
         }
-        if (StringUtils.isBlank(sb)) {
-            redisUtil.hmDel(RedisKeyConstant.LOGANS_ANS, key);
-        }
         redisUtil.hmSet(RedisKeyConstant.LOGANS_ANS, key, sb.substring(1));
-        redisUtil.expire(RedisKeyConstant.LOGANS_ANS, RedisKeyConstant.EXPIRE_TIME, TimeUnit.SECONDS);
+        Long expire = redisUtil.getExpire(RedisKeyConstant.LOGANS_ANS);
+        if (expire <= 60) {
+            redisUtil.expire(RedisKeyConstant.LOGANS_ANS, RedisKeyConstant.EXPIRE_TIME, TimeUnit.SECONDS);
+        }
     }
+
 
 
 }///:~
