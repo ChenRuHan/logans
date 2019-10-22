@@ -45,24 +45,24 @@ public class InitTask {
     private String appName;
 
     /**
-     * 【描 述】：初始化日志分析任务配置--每分钟执行一次
+     * 【描 述】：初始化日志分析任务配置--每30s执行一次
      *
      * @since 2019-09-20 15:23:34
      */
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0/30 * * * * ?")
     public void initTask() {
         taskInitHandler.initTask();
     }
 
     /**
-     * 【描 述】：初始化IP地址--每分钟执行一次
+     * 【描 述】：初始化IP地址--每30s执行一次
      *
      * @param
      * @return void
      * @author 陈汝晗
      * @since 2019/9/21 16:07
      */
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0/30 * * * * ?")
     @MySyncLock(key = "logans:lock:client:ip", debug = false, exeOnce = true)
     public void initClient() {
         Application application = eurekaClient.getApplication(StringUtils.upperCase(appName));
