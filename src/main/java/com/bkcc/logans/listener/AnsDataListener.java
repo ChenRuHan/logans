@@ -2,6 +2,7 @@ package com.bkcc.logans.listener;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bkcc.hbase.util.HBaseUtil;
+import com.bkcc.logans.constant.LogansMQConstant;
 import com.bkcc.logans.constant.TaskConstant;
 import com.bkcc.logans.entity.FieldEntity;
 import com.bkcc.logans.entity.TaskEntity;
@@ -71,7 +72,7 @@ public class AnsDataListener {
      * @author 陈汝晗
      * @since 2019/10/17 13:51
      */
-    @JmsListener(destination = "logans_log", containerFactory = "queueListenerFactory")
+    @JmsListener(destination = LogansMQConstant.LOGANS_LOG, containerFactory = "queueListenerFactory")
     public void getNewData(String jsonStr) {
         JSONObject json = JSONObject.parseObject(jsonStr);
         AnsLogHbaseEntity ansLogHbaseEntity = new AnsLogHbaseEntity();

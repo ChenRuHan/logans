@@ -72,7 +72,6 @@ public class TaskEntity extends BaseEntity{
      */
     private String outQueue;
 
-
     /**
      * 【描 述】：cron表达式
      *
@@ -107,6 +106,13 @@ public class TaskEntity extends BaseEntity{
      *  @since 2019/9/23 10:15
      */
     private String endTime;
+
+    /**
+     * 【描 述】：任务状态0--关闭，1--开启
+     *
+     *  @since 2019/10/22 10:32
+     */
+    private Integer status;
 
     public String getAnsCronByAnsRateType() {
         if (CalendarEnum.MINUTE.equels(ansRateType)) {

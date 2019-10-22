@@ -19,6 +19,17 @@
         columns: [[
             {field: 'id', checkbox: true},
             {field: 'taskName', title: '任务名称', width: 40},
+            {
+                field: 'status', title: '状态', width: 20, formatter: function (value) {
+                    switch (value) {
+                        case 0:
+                            return "关闭";
+                        case 1:
+                            return "开启";
+                    }
+                    return '';
+                }
+            },
             {field: 'moduleName', title: '微服务模块', width: 40},
             {field: 'reqMethod', title: '请求的方法', width: 20},
             {field: 'reqUri', title: '分析URI', width: 40},
@@ -116,15 +127,60 @@
                     }
                 });
             }
-        }],
+        },{text: '开启',iconCls: 'icon-confirm',onClick: function (e) {
+                var rowData = taskGridArea.datagrid('getSelected');
+                if (!rowData){
+                    $.alert.info('请选中一条记录');
+                    return;
+                }
+                if(rowData.status == 1){
+                    return;
+                }
+                check(rowData.id, 1);
+            }},
+            '-',
+            {text: '关闭',iconCls: 'icon-remove', onClick: function () {
+                    var rowData = taskGridArea.datagrid('getSelected');
+                    if (!rowData){
+                        $.alert.info('请选中一条记录');
+                        return;
+                    }
+                    if(rowData.status == 0){
+                        return;
+                    }
+                    check(rowData.id, 0);
+                }}],
         onDblClickRow: function (rowIndex, rowData) {
             resGridArea.loadData({
                 taskId: rowData.id
             });
         }
-
     }
 
+    function check(taskId, status) {
+        var msg = status == 1 ? '确定开启任务么？':'确定关闭任务么？';
+        $.messager.confirm('提示',msg,function(r){
+            if (r){
+                $.ajax({
+                    url: __ctx + '/api/task',
+                    contentType: 'application/json;charset=utf-8',
+                    method : 'post',
+                    data : JSON.stringify({
+                        status : status,
+                        id : taskId
+                    }),
+                    success: function(viewData) {
+                        viewData = JSON.parse(viewData);
+                        if(!viewData.isSucceed) {
+                            $.messager.alert('错误', viewData.message);
+                            return;
+                        }
+                        taskGridArea.datagrid('reload');
+                    }
+                })
+            }
+        });
+    }
 
     var logSourceDataList = [{
         'id': '1',
