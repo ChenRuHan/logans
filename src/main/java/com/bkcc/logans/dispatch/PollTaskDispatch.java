@@ -63,13 +63,26 @@ public class PollTaskDispatch extends AbstractTaskDispatch {
                 }
             }
         }
-        String myIp = ip + ":" + port;
-        if (StringUtils.equals(nextIp, myIp)) {
-            redisUtil.hmSet(RedisKeyConstant.TASK_KEY, taskId, myIp);
-            redisUtil.expire(RedisKeyConstant.TASK_KEY, RedisKeyConstant.EXPIRE_TIME * 60, TimeUnit.SECONDS);
+        if (StringUtils.equals(nextIp, ip + ":" + port)) {
             return true;
         }
         return false;
     }
+
+
+    /**
+     * 【描 述】：执行完毕之后执行
+     *
+     * @param taskId
+     * @return void
+     * @author 陈汝晗
+     * @since 2019/10/22 14:10
+     */
+    @Override
+    public void afterExecute(Long taskId) {
+        redisUtil.hmSet(RedisKeyConstant.TASK_KEY, taskId, ip + ":" + port);
+        redisUtil.expire(RedisKeyConstant.TASK_KEY, RedisKeyConstant.EXPIRE_TIME * 60, TimeUnit.SECONDS);
+    }
+
 
 }///:~

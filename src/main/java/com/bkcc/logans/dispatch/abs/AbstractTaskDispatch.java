@@ -19,4 +19,14 @@ public abstract class AbstractTaskDispatch {
      */
     public abstract boolean canExecute(Long taskId);
 
+    /**
+     * 【描 述】：执行完毕之后执行
+     *
+     * @param taskId
+     * @return void
+     * @author 陈汝晗
+     * @since 2019/10/22 14:10
+     */
+    public void afterExecute(Long taskId){}
+
 }///:~

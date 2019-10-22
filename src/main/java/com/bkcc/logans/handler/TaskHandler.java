@@ -52,6 +52,7 @@ public class TaskHandler implements Runnable{
             e1 = e;
         }
         actuator.afterExecute(res, e1);
+        taskDispatch.afterExecute(taskId);
     }
 
 
