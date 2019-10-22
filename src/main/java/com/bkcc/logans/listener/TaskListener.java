@@ -1,9 +1,7 @@
 package com.bkcc.logans.listener;
 
-import com.alibaba.fastjson.JSONObject;
 import com.bkcc.logans.actuator.abs.AbstractTaskActuator;
 import com.bkcc.logans.config.LogansSchedulingConfigurer;
-import com.bkcc.logans.constant.LogansMQConstant;
 import com.bkcc.logans.constant.RedisKeyConstant;
 import com.bkcc.logans.constant.TaskConstant;
 import com.bkcc.logans.dispatch.abs.AbstractTaskDispatch;
@@ -14,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
-import org.springframework.jms.annotation.JmsListener;
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
@@ -47,24 +44,6 @@ public class TaskListener {
     @Autowired
     private ApplicationContext applicationContext;
 
-    /**
-     * 【描 述】：监听任务状态
-     *
-     * @param taskMap
-     * @return void
-     * @author 陈汝晗
-     * @since 2019/10/22 10:01
-     */
-    @JmsListener(destination = LogansMQConstant.LOGANS_TASK)
-    public void task(String str) {
-        if (StringUtils.isBlank(str)) {
-            return;
-        }
-        JSONObject json = JSONObject.parseObject(str);
-        removeTask(json.getObject(TaskConstant.DELETE_STATUS, TaskEntity.class));
-        updateTask(json.getObject(TaskConstant.UPDATE_STATUS, TaskEntity.class));
-        insertTask(json.getObject(TaskConstant.INSERT_STATUS, TaskEntity.class));
-    }
 
     /**
      * 【描 述】：修改任务
@@ -74,7 +53,7 @@ public class TaskListener {
      * @author 陈汝晗
      * @since 2019/10/22 09:59
      */
-    private void updateTask(TaskEntity task) {
+    public void updateTask(TaskEntity task) {
         removeTask(task);
         insertTask(task);
     }
@@ -87,13 +66,13 @@ public class TaskListener {
      * @author 陈汝晗
      * @since 2019/10/22 09:52
      */
-    private void insertTask(TaskEntity task) {
+    public void insertTask(TaskEntity task) {
         if (task == null) {
             return;
         }
+        insertTask2Redis(task);
         Long taskId = task.getId();
         TaskConstant.TASK_MAP.put(taskId, task);
-        insertTask2Redis(task);
         if (task.getAnsRateType() == null) {
             return;
         }
@@ -117,12 +96,12 @@ public class TaskListener {
      * @author 陈汝晗
      * @since 2019/10/22 09:51
      */
-    private void removeTask(TaskEntity task) {
+    public void removeTask(TaskEntity task) {
         if (task == null) {
             return;
         }
-        Long taskId = task.getId();
         removeTask2Redis(task);
+        Long taskId = task.getId();
         TaskConstant.TASK_MAP.remove(taskId);
         ScheduledTask scheduledTask = TaskConstant.SCHEDULED_TASK_MAP.remove(taskId);
         if (scheduledTask == null) {

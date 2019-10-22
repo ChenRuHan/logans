@@ -11,9 +11,6 @@ public class LogansMQConstant {
 
     public final static String LOGANS_LOG = "logans_log";
 
-    public final static String LOGANS_TASK = "logans_task";
-
-
     private LogansMQConstant(){};
 
 }///:~

@@ -1,15 +1,13 @@
 package com.bkcc.logans.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.bkcc.core.data.ViewData;
 import com.bkcc.logans.actuator.abs.AbstractTaskActuator;
-import com.bkcc.logans.constant.LogansMQConstant;
-import com.bkcc.logans.constant.TaskConstant;
 import com.bkcc.logans.controller.base.BaseController;
 import com.bkcc.logans.dispatch.abs.AbstractTaskDispatch;
 import com.bkcc.logans.entity.TaskEntity;
 import com.bkcc.logans.enums.TaskStatusEnum;
 import com.bkcc.logans.handler.TaskHandler;
+import com.bkcc.logans.listener.TaskListener;
 import com.bkcc.logans.service.TaskService;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
@@ -18,10 +16,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.apache.activemq.command.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,10 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
-
-import javax.jms.Destination;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 【描 述】：日志分析任务配置表Controller
@@ -55,14 +47,14 @@ public class TaskController extends BaseController {
      */
     @Autowired
     private TaskService taskService;
-
     /**
-     * 【描 述】：消息通知
+     * 【描 述】：任务列表监听类
      *
-     * @since Aug 16, 2019 v1.0
+     *  @since 2019/10/22 14:02
      */
     @Autowired
-    private JmsMessagingTemplate jmsTemplate;
+    private TaskListener taskListener;
+
 
     /**
      * 【描 述】：查询日志分析任务配置表信息列表
@@ -146,20 +138,17 @@ public class TaskController extends BaseController {
         }
         taskService.insertOrUpdate(task);
 
-        Map<String, TaskEntity> taskMap = new HashMap<>();
         if (isAdd) {
             if (TaskStatusEnum.OPEN.equels(task.getStatus())) {
-                taskMap.put(TaskConstant.INSERT_STATUS, task);
+                taskListener.insertTask(task);
             }
         } else {
             if (TaskStatusEnum.CLOSE.equels(task.getStatus())) {
-                taskMap.put(TaskConstant.DELETE_STATUS, task);
+                taskListener.removeTask(task);
             } else if (TaskStatusEnum.OPEN.equels(task.getStatus())) {
-                taskMap.put(TaskConstant.UPDATE_STATUS, task);
+                taskListener.updateTask(task);
             }
         }
-        Destination destination = new ActiveMQTopic(LogansMQConstant.LOGANS_TASK);
-        jmsTemplate.convertAndSend(destination, JSONObject.toJSONString(taskMap));
         return ViewData.put("id", task.getId());
     }
 
@@ -181,10 +170,7 @@ public class TaskController extends BaseController {
             return ViewData.ok();
         }
         taskService.deleteTaskById(taskId);
-        Map<String, TaskEntity> taskMap = new HashMap<>();
-        taskMap.put(TaskConstant.DELETE_STATUS, task);
-        Destination destination = new ActiveMQTopic(LogansMQConstant.LOGANS_TASK);
-        jmsTemplate.convertAndSend(destination, JSONObject.toJSONString(taskMap));
+        taskListener.removeTask(task);
         return ViewData.ok();
     }
 

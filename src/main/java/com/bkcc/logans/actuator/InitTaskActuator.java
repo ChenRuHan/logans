@@ -1,21 +1,15 @@
 package com.bkcc.logans.actuator;
 
-import com.alibaba.fastjson.JSONObject;
 import com.bkcc.logans.actuator.abs.AbstractTaskActuator;
-import com.bkcc.logans.constant.LogansMQConstant;
 import com.bkcc.logans.constant.TaskConstant;
 import com.bkcc.logans.entity.TaskEntity;
 import com.bkcc.logans.enums.TaskStatusEnum;
 import com.bkcc.logans.listener.TaskListener;
 import com.bkcc.logans.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.command.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.jms.Destination;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -32,15 +26,6 @@ import java.util.Set;
 @Slf4j
 @Component
 public class InitTaskActuator extends AbstractTaskActuator {
-
-    /**
-     * 【描 述】：消息通知
-     *
-     * @since Aug 16, 2019 v1.0
-     */
-    @Autowired
-    private JmsMessagingTemplate jmsTemplate;
-
     /**
      * 【描 述】：日志分析任务配置表业务接口
      *
@@ -48,6 +33,11 @@ public class InitTaskActuator extends AbstractTaskActuator {
      */
     @Autowired
     private TaskService taskService;
+    /**
+     * 【描 述】：任务列表监听类
+     *
+     *  @since 2019/10/22 14:02
+     */
     @Autowired
     private TaskListener taskListener;
 
@@ -63,8 +53,6 @@ public class InitTaskActuator extends AbstractTaskActuator {
         /*
             添加新任务
          */
-        Destination destination = new ActiveMQTopic(LogansMQConstant.LOGANS_TASK);
-        Map<String, TaskEntity> taskMap = new HashMap<>();
         Set<Long> taskIdSet = new HashSet<>();
 
         for (TaskEntity task : getTaskList()) {
@@ -72,13 +60,11 @@ public class InitTaskActuator extends AbstractTaskActuator {
             taskIdSet.add(task.getId());
             if (TaskConstant.TASK_MAP.containsKey(task.getId())) {
                 if (TaskStatusEnum.CLOSE.equels(task.getStatus())) {
-                    taskMap.put(TaskConstant.DELETE_STATUS, task);
-                    jmsTemplate.convertAndSend(destination, JSONObject.toJSONString(taskMap));
+                    taskListener.removeTask(task);
                 }
             } else {
                 if (TaskStatusEnum.OPEN.equels(task.getStatus())) {
-                    taskMap.put(TaskConstant.INSERT_STATUS, task);
-                    jmsTemplate.convertAndSend(destination, JSONObject.toJSONString(taskMap));
+                    taskListener.insertTask(task);
                 }
             }
         }
@@ -86,15 +72,12 @@ public class InitTaskActuator extends AbstractTaskActuator {
             去掉多余任务
          */
         Iterator<Map.Entry<Long, TaskEntity>> it = TaskConstant.TASK_MAP.entrySet().iterator();
-        taskMap = new HashMap<>();
         while (it.hasNext()) {
             Map.Entry<Long, TaskEntity> m = it.next();
             Long taskId = m.getKey();
             if (!taskIdSet.contains(taskId)) {
-                taskMap.put(TaskConstant.DELETE_STATUS, m.getValue());
-                taskListener.insertTask2Redis(m.getValue());
+                taskListener.removeTask(m.getValue());
             }
-            jmsTemplate.convertAndSend(destination, JSONObject.toJSONString(taskMap));
         }
         return null;
     }
