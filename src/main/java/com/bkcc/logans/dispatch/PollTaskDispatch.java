@@ -1,6 +1,7 @@
 package com.bkcc.logans.dispatch;
 
 import com.bkcc.logans.constant.RedisKeyConstant;
+import com.bkcc.logans.constant.TaskConstant;
 import com.bkcc.logans.dispatch.abs.AbstractTaskDispatch;
 import com.bkcc.util.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +54,8 @@ public class PollTaskDispatch extends AbstractTaskDispatch {
         if (StringUtils.equals(lastExeTime, now)) {
             return false;
         }
-        redisUtil.set(lastExeTimeKey, now);
+
+        redisUtil.set(lastExeTimeKey, now, TaskConstant.getExpireTime(taskId));
 
         String lastExeIp = (String) redisUtil.hmGet(RedisKeyConstant.TASK_KEY, taskId);
         String nextIp = "";
@@ -94,7 +96,7 @@ public class PollTaskDispatch extends AbstractTaskDispatch {
     @Override
     public void afterExecute(Long taskId) {
         redisUtil.hmSet(RedisKeyConstant.TASK_KEY, taskId, ip + ":" + port);
-        redisUtil.expire(RedisKeyConstant.TASK_KEY, RedisKeyConstant.EXPIRE_TIME * 60, TimeUnit.SECONDS);
+        redisUtil.expire(RedisKeyConstant.TASK_KEY, TaskConstant.getExpireTime(taskId).intValue(), TimeUnit.SECONDS);
     }
 
 
