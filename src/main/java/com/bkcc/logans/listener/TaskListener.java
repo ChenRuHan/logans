@@ -146,6 +146,10 @@ public class TaskListener {
         if (StringUtils.isBlank(value)) {
             value = taskId;
         } else {
+            Set<String> idSet = new HashSet<>(Arrays.asList(value.split(",")));
+            if (idSet.contains(taskId)) {
+                return;
+            }
             value += "," + taskId;
         }
         redisUtil.hmSet(RedisKeyConstant.LOGANS_ANS, key, value);

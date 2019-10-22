@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -48,7 +47,7 @@ public class PollTaskDispatch extends AbstractTaskDispatch {
             Set<Object> keys = redisUtil.hmKeys(RedisKeyConstant.IP_KEY);
             for (Object key : keys) {
                 nextIp = key.toString();
-                continue;
+                break;
             }
         } else {
             nextIp = (String) redisUtil.hmGet(RedisKeyConstant.IP_KEY, lastExeIp);
@@ -59,14 +58,13 @@ public class PollTaskDispatch extends AbstractTaskDispatch {
                 Set<Object> keys = redisUtil.hmKeys(RedisKeyConstant.IP_KEY);
                 for (Object key : keys) {
                     nextIp = key.toString();
-                    continue;
+                    break;
                 }
             }
         }
-        Set<String> ipSet = new HashSet<>();
-        ipSet.add(ip + ":" + port);
-        if (ipSet.contains(nextIp)) {
-            redisUtil.hmSet(RedisKeyConstant.TASK_KEY, taskId, nextIp);
+        String myIp = ip + ":" + port;
+        if (StringUtils.equals(nextIp, myIp)) {
+            redisUtil.hmSet(RedisKeyConstant.TASK_KEY, taskId, myIp);
             return true;
         }
         return false;
