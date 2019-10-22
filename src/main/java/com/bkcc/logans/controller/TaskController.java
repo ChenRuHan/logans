@@ -18,7 +18,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.apache.activemq.command.ActiveMQQueue;
+import org.apache.activemq.command.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.core.JmsMessagingTemplate;
@@ -158,7 +158,7 @@ public class TaskController extends BaseController {
                 taskMap.put(TaskConstant.UPDATE_STATUS, task);
             }
         }
-        Destination destination = new ActiveMQQueue(LogansMQConstant.LOGANS_TASK);
+        Destination destination = new ActiveMQTopic(LogansMQConstant.LOGANS_TASK);
         jmsTemplate.convertAndSend(destination, JSONObject.toJSONString(taskMap));
         return ViewData.put("id", task.getId());
     }
@@ -183,7 +183,7 @@ public class TaskController extends BaseController {
         taskService.deleteTaskById(taskId);
         Map<String, TaskEntity> taskMap = new HashMap<>();
         taskMap.put(TaskConstant.DELETE_STATUS, task);
-        Destination destination = new ActiveMQQueue(LogansMQConstant.LOGANS_TASK);
+        Destination destination = new ActiveMQTopic(LogansMQConstant.LOGANS_TASK);
         jmsTemplate.convertAndSend(destination, JSONObject.toJSONString(taskMap));
         return ViewData.ok();
     }

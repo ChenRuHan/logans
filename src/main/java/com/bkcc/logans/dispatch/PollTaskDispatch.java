@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 【描 述】：轮询式任务调度器，任务轮询在每台机器中执行
@@ -65,6 +66,7 @@ public class PollTaskDispatch extends AbstractTaskDispatch {
         String myIp = ip + ":" + port;
         if (StringUtils.equals(nextIp, myIp)) {
             redisUtil.hmSet(RedisKeyConstant.TASK_KEY, taskId, myIp);
+            redisUtil.expire(RedisKeyConstant.TASK_KEY, RedisKeyConstant.EXPIRE_TIME * 60, TimeUnit.SECONDS);
             return true;
         }
         return false;

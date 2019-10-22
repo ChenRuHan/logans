@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 【描 述】：任务列表监听类
@@ -54,7 +55,7 @@ public class TaskListener {
      * @author 陈汝晗
      * @since 2019/10/22 10:01
      */
-    @JmsListener(destination = LogansMQConstant.LOGANS_TASK, containerFactory = "queueListenerFactory")
+    @JmsListener(destination = LogansMQConstant.LOGANS_TASK)
     public void task(String str) {
         if (StringUtils.isBlank(str)) {
             return;
@@ -139,7 +140,10 @@ public class TaskListener {
      * @author 陈汝晗
      * @since 2019/10/17 13:47
      */
-    private void insertTask2Redis(TaskEntity taskEntity) {
+    public void insertTask2Redis(TaskEntity taskEntity) {
+        if (taskEntity == null) {
+            return;
+        }
         String key = taskEntity.getModuleName() + taskEntity.getReqMethod() + taskEntity.getReqUri();
         String taskId = taskEntity.getId() + "";
         String value = (String) redisUtil.hmGet(RedisKeyConstant.LOGANS_ANS, key);
@@ -153,6 +157,7 @@ public class TaskListener {
             value += "," + taskId;
         }
         redisUtil.hmSet(RedisKeyConstant.LOGANS_ANS, key, value);
+        redisUtil.expire(RedisKeyConstant.LOGANS_ANS, RedisKeyConstant.EXPIRE_TIME, TimeUnit.SECONDS);
     }
 
 
@@ -164,7 +169,10 @@ public class TaskListener {
      * @author 陈汝晗
      * @since 2019/10/17 13:47
      */
-    private void removeTask2Redis(TaskEntity taskEntity) {
+    public void removeTask2Redis(TaskEntity taskEntity) {
+        if (taskEntity == null) {
+            return;
+        }
         String key = taskEntity.getModuleName() + taskEntity.getReqMethod() + taskEntity.getReqUri();
         String taskId = taskEntity.getId() + "";
         String value = (String) redisUtil.hmGet(RedisKeyConstant.LOGANS_ANS, key);
@@ -186,6 +194,7 @@ public class TaskListener {
             redisUtil.hmDel(RedisKeyConstant.LOGANS_ANS, key);
         }
         redisUtil.hmSet(RedisKeyConstant.LOGANS_ANS, key, sb.substring(1));
+        redisUtil.expire(RedisKeyConstant.LOGANS_ANS, RedisKeyConstant.EXPIRE_TIME, TimeUnit.SECONDS);
     }
 
 

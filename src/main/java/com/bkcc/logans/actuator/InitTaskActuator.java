@@ -6,9 +6,10 @@ import com.bkcc.logans.constant.LogansMQConstant;
 import com.bkcc.logans.constant.TaskConstant;
 import com.bkcc.logans.entity.TaskEntity;
 import com.bkcc.logans.enums.TaskStatusEnum;
+import com.bkcc.logans.listener.TaskListener;
 import com.bkcc.logans.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.command.ActiveMQQueue;
+import org.apache.activemq.command.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.stereotype.Component;
@@ -47,6 +48,8 @@ public class InitTaskActuator extends AbstractTaskActuator {
      */
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private TaskListener taskListener;
 
     /**
      * 【描 述】：执行初始化定时任务任务方法
@@ -60,11 +63,12 @@ public class InitTaskActuator extends AbstractTaskActuator {
         /*
             添加新任务
          */
-        Destination destination = new ActiveMQQueue(LogansMQConstant.LOGANS_TASK);
+        Destination destination = new ActiveMQTopic(LogansMQConstant.LOGANS_TASK);
         Map<String, TaskEntity> taskMap = new HashMap<>();
         Set<Long> taskIdSet = new HashSet<>();
 
         for (TaskEntity task : getTaskList()) {
+            taskListener.insertTask2Redis(task);
             taskIdSet.add(task.getId());
             if (TaskConstant.TASK_MAP.containsKey(task.getId())) {
                 if (TaskStatusEnum.CLOSE.equels(task.getStatus())) {
@@ -88,6 +92,7 @@ public class InitTaskActuator extends AbstractTaskActuator {
             Long taskId = m.getKey();
             if (!taskIdSet.contains(taskId)) {
                 taskMap.put(TaskConstant.DELETE_STATUS, m.getValue());
+                taskListener.insertTask2Redis(m.getValue());
             }
             jmsTemplate.convertAndSend(destination, JSONObject.toJSONString(taskMap));
         }
