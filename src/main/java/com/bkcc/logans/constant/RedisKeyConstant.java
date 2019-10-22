@@ -15,6 +15,8 @@ public class RedisKeyConstant {
 
     public static final String LOGANS_ANS = "logans:ans";
 
+    public static final String TASK_LAST_EXE_TIME = "logans:lastexe:";
+
     public static final int EXPIRE_TIME = 90;
 
     private RedisKeyConstant() {}

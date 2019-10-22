@@ -5,10 +5,12 @@ import com.bkcc.logans.dispatch.abs.AbstractTaskDispatch;
 import com.bkcc.util.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -42,6 +44,17 @@ public class PollTaskDispatch extends AbstractTaskDispatch {
      */
     @Override
     public boolean canExecute(Long taskId) {
+        /*
+           解决多个服务器时间差问题。判断任务在当前时间段是否已经执行
+         */
+        String now = FastDateFormat.getInstance("yyyyMMddHHmm").format(new Date());
+        String lastExeTimeKey = RedisKeyConstant.TASK_LAST_EXE_TIME + taskId;
+        String lastExeTime = redisUtil.getString(lastExeTimeKey);
+        if (StringUtils.equals(lastExeTime, now)) {
+            return false;
+        }
+        redisUtil.set(lastExeTimeKey, now);
+
         String lastExeIp = (String) redisUtil.hmGet(RedisKeyConstant.TASK_KEY, taskId);
         String nextIp = "";
         if (StringUtils.isBlank(lastExeIp)) {
