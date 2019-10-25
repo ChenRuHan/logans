@@ -89,7 +89,7 @@ public class LogansTaskActuator extends AbstractTaskActuator {
     /**
      * 【描 述】：获取分析日志接口
      *
-     *  @since 2019/10/17 15:04
+     * @since 2019/10/17 15:04
      */
     @Autowired
     @Qualifier("getHbaseAnsLogService")
@@ -98,7 +98,7 @@ public class LogansTaskActuator extends AbstractTaskActuator {
     /**
      * 【描 述】：获取分析日志接口
      *
-     *  @since 2019/10/17 15:04
+     * @since 2019/10/17 15:04
      */
     @Autowired
     @Qualifier("getESAnsLogService")
@@ -157,12 +157,17 @@ public class LogansTaskActuator extends AbstractTaskActuator {
                 json.put(key, value);
                 fieldSb.append(value);
             }
-            json.put("_count", 1);
+            json.put(TaskConstant.COUNT, 1);
             returnJsonList.add(json);
             QueryResHbaseEntity taskResHbaseEntity = new QueryResHbaseEntity();
+
             String rowKey = EncryptAndDecryptUtil.encrypt(fieldSb.toString());
             value2JsonMap.put(rowKey, json);
-            taskResHbaseEntity.setRowKey(reverseOrderNO + "-" + rowKey + "-" + HBaseUtil.fillKey(i, 6));
+            if (AnsTypeEnum.COUNT_ANS_WITHOUT_REPEAT.equels(taskEntity.getAnsType())) {
+                taskResHbaseEntity.setRowKey(reverseOrderNO + "-" + rowKey);
+            } else if (AnsTypeEnum.COUNT_ANS.equels(taskEntity.getAnsType())) {
+                taskResHbaseEntity.setRowKey(reverseOrderNO + "-" + rowKey + "-" + HBaseUtil.fillKey(i, 6));
+            }
             taskResHbaseEntity.setR("1");
             taskResHbaseList.add(taskResHbaseEntity);
         }
@@ -171,12 +176,21 @@ public class LogansTaskActuator extends AbstractTaskActuator {
             return returnJsonList;
         }
 
+        if (AnsTypeEnum.COUNT_ANS_WITHOUT_REPEAT.equels(taskEntity.getAnsType())) {
+            JSONObject json = new JSONObject();
+            String beginRow = reverseOrderNO + "-000000";
+            String endRow = reverseOrderNO + "-zzzzzzz";
+            long c = queryResRepository.count(beginRow, endRow);
+            json.put(TaskConstant.COUNT, c);
+            return json;
+        }
+
         for (String key : value2JsonMap.keySet()) {
             String beginRow = reverseOrderNO + "-" + key + "-000000";
             String endRow = reverseOrderNO + "-" + key + "-999999";
             long c = queryResRepository.count(beginRow, endRow);
             JSONObject json = value2JsonMap.get(key);
-            json.put("_count", c);
+            json.put(TaskConstant.COUNT, c);
         }
 
         return value2JsonMap.values();

@@ -7,7 +7,6 @@ import com.bkcc.logans.dispatch.abs.AbstractTaskDispatch;
 import com.bkcc.logans.entity.TaskEntity;
 import com.bkcc.logans.enums.TaskStatusEnum;
 import com.bkcc.logans.handler.TaskHandler;
-import com.bkcc.logans.listener.TaskListener;
 import com.bkcc.logans.service.TaskService;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
@@ -47,14 +46,6 @@ public class TaskController extends BaseController {
      */
     @Autowired
     private TaskService taskService;
-    /**
-     * 【描 述】：任务列表监听类
-     *
-     *  @since 2019/10/22 14:02
-     */
-    @Autowired
-    private TaskListener taskListener;
-
 
     /**
      * 【描 述】：查询日志分析任务配置表信息列表
@@ -132,23 +123,7 @@ public class TaskController extends BaseController {
         if (task.getStatus() == null) {
             task.setStatus(TaskStatusEnum.OPEN.getValue());
         }
-        boolean isAdd = false;
-        if (task.getId() == null || task.getId() <= 0) {
-            isAdd = true;
-        }
         taskService.insertOrUpdate(task);
-
-        if (isAdd) {
-            if (TaskStatusEnum.OPEN.equels(task.getStatus())) {
-                taskListener.insertTask(task);
-            }
-        } else {
-            if (TaskStatusEnum.CLOSE.equels(task.getStatus())) {
-                taskListener.removeTask(task);
-            } else if (TaskStatusEnum.OPEN.equels(task.getStatus())) {
-                taskListener.updateTask(task);
-            }
-        }
         return ViewData.put("id", task.getId());
     }
 
@@ -170,7 +145,6 @@ public class TaskController extends BaseController {
             return ViewData.ok();
         }
         taskService.deleteTaskById(taskId);
-        taskListener.removeTask(task);
         return ViewData.ok();
     }
 
