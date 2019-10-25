@@ -120,6 +120,7 @@ public class LogansTaskActuator extends AbstractTaskActuator {
             return null;
         }
         List<JSONObject> ansLogList = null;
+
         if (LogSourceEnum.ES.equels(taskEntity.getLogSource())) {
             ansLogList = getESAnsLogService.getAnsLogList(taskEntity);
         } else if (LogSourceEnum.HBASE.equels(taskEntity.getLogSource())) {
@@ -172,6 +173,12 @@ public class LogansTaskActuator extends AbstractTaskActuator {
             taskResHbaseList.add(taskResHbaseEntity);
         }
         queryResRepository.save(taskResHbaseList);
+
+
+
+
+
+
         if (AnsTypeEnum.NOT_ANS.equels(taskEntity.getAnsType())) {
             return returnJsonList;
         }
