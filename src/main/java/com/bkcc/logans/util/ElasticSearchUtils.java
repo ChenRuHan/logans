@@ -111,7 +111,7 @@ public class ElasticSearchUtils {
         Map<String, Object> queryMap = MapUtils.createNewMap("query", paramMap);
         queryMap.put("_source", source);
         queryMap.put("from", 0);
-        queryMap.put("size", Integer.MAX_VALUE);
+        queryMap.put("size", 10000);
         return queryMap;
     }
 }///:~
