@@ -108,6 +108,9 @@ public class ElasticSearchUtils {
         boolMap.put("filter", MapUtils.createNewMap("range", MapUtils.createNewMap("timestamp.keyword", timeRangeMap)));
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("bool", boolMap);
-        return MapUtils.createNewMap("query", paramMap);
+        Map<String, Object> queryMap = MapUtils.createNewMap("query", paramMap);
+        queryMap.put("from", 0);
+        queryMap.put("size", Integer.MAX_VALUE);
+        return queryMap;
     }
 }///:~
