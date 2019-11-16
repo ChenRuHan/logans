@@ -96,7 +96,7 @@ public class ElasticSearchUtils {
 		return returnList;
 	}
 
-    public static Map<String, Object> createParam(TaskEntity taskEntity) {
+    public static Map<String, Object> createParam(TaskEntity taskEntity, String[] source) {
         Map<String, Object> timeRangeMap = new HashMap<>();
         timeRangeMap.put("gte", taskEntity.getBeginTime());
         timeRangeMap.put("lte", taskEntity.getEndTime());
@@ -109,6 +109,7 @@ public class ElasticSearchUtils {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("bool", boolMap);
         Map<String, Object> queryMap = MapUtils.createNewMap("query", paramMap);
+        queryMap.put("_source", source);
         queryMap.put("from", 0);
         queryMap.put("size", Integer.MAX_VALUE);
         return queryMap;
