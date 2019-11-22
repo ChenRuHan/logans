@@ -46,6 +46,7 @@ public class TaskHandler implements Runnable{
             actuator.setExeEndTime(DateTimeUtils.formatDate());
             actuator.afterExecuteSuccess(res);
         } catch (Exception e) {
+            log.error("# end执行任务taskNO{},taskId:{},异常:{}", taskNO, taskId, e.getMessage(), e);
             log.debug("# end执行任务taskNO:{}, fail, taskId:{}, 耗时:{}毫秒, errorMsg:{}", taskNO, taskId, (System.currentTimeMillis() - tl), e.getMessage(), e);
             actuator.setExeEndTime(DateTimeUtils.formatDate());
             actuator.afterExecuteError(e);
