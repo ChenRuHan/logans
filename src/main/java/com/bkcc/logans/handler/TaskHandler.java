@@ -40,14 +40,14 @@ public class TaskHandler implements Runnable{
             actuator.setOrderNO(taskNO);
             actuator.setExeBeginTime(DateTimeUtils.formatDate());
             actuator.preExecute();
-            log.debug("# begin执行任务taskNO:{}, {}", taskNO, TaskConstant.TASK_MAP.get(taskId));
+            log.info("# begin执行任务taskNO:{}, {}", taskNO, TaskConstant.TASK_MAP.get(taskId));
             res = actuator.execute();
-            log.debug("# end执行任务taskNO:{}, success, taskId:{}, 耗时:{}毫秒", taskNO, taskId, (System.currentTimeMillis() - tl));
+            log.info("# end执行任务taskNO:{}, success, taskId:{}, 耗时:{}毫秒", taskNO, taskId, (System.currentTimeMillis() - tl));
             actuator.setExeEndTime(DateTimeUtils.formatDate());
             actuator.afterExecuteSuccess(res);
         } catch (Exception e) {
             log.error("# end执行任务taskNO{},taskId:{},异常:{}", taskNO, taskId, e.getMessage(), e);
-            log.debug("# end执行任务taskNO:{}, fail, taskId:{}, 耗时:{}毫秒, errorMsg:{}", taskNO, taskId, (System.currentTimeMillis() - tl), e.getMessage(), e);
+            log.info("# end执行任务taskNO:{}, fail, taskId:{}, 耗时:{}毫秒, errorMsg:{}", taskNO, taskId, (System.currentTimeMillis() - tl), e.getMessage(), e);
             actuator.setExeEndTime(DateTimeUtils.formatDate());
             actuator.afterExecuteError(e);
             e1 = e;
