@@ -2,6 +2,7 @@ package com.bkcc.logans.util;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bkcc.logans.entity.TaskEntity;
+import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.SimpleDateFormat;
@@ -65,11 +66,15 @@ public class ElasticSearchUtils {
 	 * @return
 	 * @since Apr 29, 2019
 	 */
-	public static List<JSONObject> querySimpleLogList(String url, Map<String, Object> params) {
+	public static PageInfo<JSONObject> querySimpleLogList(String url, Map<String, Object> params) {
 	    long l = System.currentTimeMillis();
 		JSONObject res = JSONObject.parseObject(MyHttpUtil.sendPostJson(params, url));
 		log.debug("# 通过ES查询简要日志\nurl==>{}\nparamMap==>{}\nres==>{}\n耗时==>{}毫秒", url ,JSONObject.toJSONString(params), res, (System.currentTimeMillis() - l));
-		return changeRes2List(res);
+        List<JSONObject> list = changeRes2List(res);
+        PageInfo<JSONObject> page = new PageInfo<>(list);
+        page.setTotal(res.getJSONObject("hits").getLong("total"));
+        page.setList(list);
+        return page;
 	}
 
 	/*

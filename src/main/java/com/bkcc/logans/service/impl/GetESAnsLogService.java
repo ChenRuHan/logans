@@ -6,6 +6,7 @@ import com.bkcc.logans.entity.TaskEntity;
 import com.bkcc.logans.service.FieldService;
 import com.bkcc.logans.service.GetAnsLogService;
 import com.bkcc.logans.util.ElasticSearchUtils;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -53,8 +54,24 @@ public class GetESAnsLogService implements GetAnsLogService {
             source[i] = fieldList.get(i).getFieldKey();
         }
         String url = ElasticSearchUtils.getSimpleLogEsUrl(taskEntity.getModuleName(), esIp, esPort);
+        int from = 0, size = 10000;
         Map<String, Object> paramMap = ElasticSearchUtils.createParam(taskEntity, source);
-        List<JSONObject> list = ElasticSearchUtils.querySimpleLogList(url, paramMap);
+        paramMap.put("from", from);
+        paramMap.put("size", size);
+        PageInfo<JSONObject> page = ElasticSearchUtils.querySimpleLogList(url, paramMap);
+        long total = page.getTotal();
+        if (total <= size) {
+            return page.getList();
+        }
+        List<JSONObject> list = page.getList();
+        long times = total % size == 0 ? total / size : total / size + 1;
+        for (int i = 1; i < times; i++) {
+            paramMap.put("from", size * i);
+            page = ElasticSearchUtils.querySimpleLogList(url, paramMap);
+            list.addAll(page.getList());
+        }
         return list;
     }
+
+
 }///:~
