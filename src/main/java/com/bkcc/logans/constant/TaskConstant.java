@@ -22,7 +22,7 @@ public class TaskConstant {
     public static final String INSERT_STATUS = "insert";
     public static final String DELETE_STATUS = "delete";
     public static final String UPDATE_STATUS = "update";
-    public static final String COUNT = "_ount";
+    public static final String COUNT = "_count";
 
 
     /**
