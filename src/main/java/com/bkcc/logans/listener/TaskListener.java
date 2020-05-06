@@ -31,9 +31,20 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 public class TaskListener {
+
+    /**
+     * 【描 述】：redis工具类
+     *
+     *  @since 2020/5/6 10:39
+     */
     @Autowired
     private RedisUtil redisUtil;
 
+    /**
+     * 【描 述】：日志定时分析任务配置
+     *
+     *  @since 2020/5/6 10:40
+     */
     @Autowired
     private LogansSchedulingConfigurer logansSchedulingConfigurer;
 
